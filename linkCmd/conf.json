@@ -1,0 +1,29 @@
+{
+    "pAbsPath": "D:/project/",
+    "pName": ["bingo_app2", "bingo_app", "bingo_app_bugfix", "bingo_app_sdk"],
+    "buildIndex": 0,
+    "gitPath": "D:/tool/Git/cmd/git.exe",
+    "bundleInMain": ["1", "2", "3", "4", "5", "8", "50000", "111001", "100000", "110001"],
+    "entranceServerList": ["http://192.168.0.105:3000/servers"],
+    "cocosCreatorRoot": "D:/tool/CocosDashboard/resources/.editors/Creator/2.4.3/CocosCreator.exe",
+    "useFastest": true,
+
+    "serverPath": "C:/Users/batata/Desktop/server/",
+    "endCalls": {
+        "0": "",
+        "1": "enheng",
+        "2": "lock",
+        "3": "close"
+    },
+    "endCallIndex": 0,
+    "install": false,
+    "setLight": -1,
+
+    "--------------------------": "--------------------------",
+
+    "buildASTC": false,
+    "copyToClient": false,
+
+    "buildPackage": false,
+    "copyToServer": false
+}

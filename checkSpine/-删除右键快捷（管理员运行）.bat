@@ -1,0 +1,1 @@
+reg delete "HKEY_LOCAL_MACHINE\SOFTWARE\Classes\Directory\background\shell\www" /f

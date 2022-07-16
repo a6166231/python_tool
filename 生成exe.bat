@@ -1,0 +1,1 @@
+pyinstaller -F 123.py

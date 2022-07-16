@@ -1,0 +1,1 @@
+schtasks  /Delete  /tn  wweather

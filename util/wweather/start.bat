@@ -1,0 +1,1 @@
+schtasks  /create  /tn  wweather /tr  C:\Users\batata\Desktop\apk\weather.py  /sc  DAILY /st  16:30:00

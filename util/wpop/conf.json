@@ -1,0 +1,11 @@
+{
+    "mail_hosts": ["smtp.163.com", "smtp.qq.com"],
+    "mailIndex": 1,
+    "users": [],
+    "pwds": [],
+    "keysIndex": 1,
+    "title": "title",
+    "message": "ssjss",
+    "tarMails": [],
+    "from": ""
+}
