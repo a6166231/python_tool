@@ -1,4 +1,4 @@
-# python_tools
+# python_tool
 使用python开发的一些插件和一些cmd命令行脚本
 
 ## checkSpine ##
