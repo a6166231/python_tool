@@ -3,3 +3,5 @@ util/wweather/conf.json
 *.apk
 *.apks
 *.aab
+util/wpop/conf.json
+linkCmd/conf.json
