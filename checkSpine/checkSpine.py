@@ -22,24 +22,25 @@ def checkAnimation(animations, vSlot, vBone, vAtt):
         return []
     for ani in animations:
         vAnimation.append(ani)
-        # errStr = LEVEL_1 + '- ' + Fore.MAGENTA + ani + Fore.RESET + ' - no [' +Fore.RED+ SPINE_COMPLETE_EVENT_NAME + Fore.RESET+ '] event' + Fore.RESET
-        # vEvent = checkAnimationEvent(animations,ani)
         vAniAttFrame = checkAnimationAttFrame(animations, ani)
-        vReadyEvent = []
-        vUnReadyEvent = []
         print(LEVEL_1 + u'动画名: ' + Fore.GREEN + ani + Fore.RESET )
+        vReadyEventSlot = []
+        vReadyEventBone = []
+        vUnReadyEvent = []
         try:
-            vReadyEvent,vUnReadyEvent = checkAllEvent(animations[ani]["events"], vSlot, vBone)
+            vReadyEventSlot,vReadyEventBone,vUnReadyEvent = checkAllEvent(animations[ani]["events"], vSlot, vBone)
         except:
             pass
         vSameAttFrame = set(vAtt) & set(vAniAttFrame)
-        if  len(vReadyEvent) == 0 and len(vSameAttFrame) == 0 and len(vUnReadyEvent) == 0:
+        if  len(vReadyEventSlot) == 0 and len(vReadyEventBone) == 0 and len(vSameAttFrame) == 0 and len(vUnReadyEvent) == 0:
             continue
 
         if len(vUnReadyEvent):
             print(LEVEL_2 + u'普通事件: '+ Fore.LIGHTWHITE_EX +'[' + ", ".join(vUnReadyEvent) + ']'+ Fore.RESET)
-        if len(vReadyEvent):
-            print(LEVEL_2 + u'可跟随的事件: '+ Fore.CYAN +'[' + ", ".join(vReadyEvent) + ']'+ Fore.RESET)
+        if len(vReadyEventSlot):
+            print(LEVEL_2 + u'可跟随的【插槽】事件: '+ Fore.CYAN +'[' + ", ".join(vReadyEventSlot) + ']'+ Fore.RESET)
+        if len(vReadyEventBone):
+            print(LEVEL_2 + u'可跟随的【骨骼】事件: '+ Fore.CYAN +'[' + ", ".join(vReadyEventBone) + ']'+ Fore.RESET)
         if len(vSameAttFrame):
             print(LEVEL_2 + u'影响替换插槽的附件帧: '+ Fore.RED +'[' + ", ".join(vSameAttFrame) + ']'+ Fore.RESET)
 
@@ -135,7 +136,8 @@ def checkAllEvent(vAniEvent, vSlot, vBone):
                 eData['end'] = eData['end'] + 1 if eData.get('end') else 1
             map[sname] = eData
             
-    readyEvent = []
+    readyEventSlot = []
+    readyEventBone = []
     for sPrefix in map:
         obj = map.get(sPrefix)
         try :
@@ -144,8 +146,12 @@ def checkAllEvent(vAniEvent, vSlot, vBone):
                 if obj['start'] == obj['end'] and obj['start'] == 1:
                     # if vSlot.get(sPrefix) and vBone.get(sPrefix):
                     # 只判断插槽、骨骼是否存在即可  动效的骨骼和插槽名可能会不一样
-                    if vSlot.get(sPrefix) or vBone.get(sPrefix):
-                        readyEvent.append(sPrefix)
+                    if vSlot.get(sPrefix):
+                        readyEventSlot.append(sPrefix)
+                        unReadyEvent.remove(sPrefix+'_start')
+                        unReadyEvent.remove(sPrefix+'_end')
+                    elif vBone.get(sPrefix):
+                        readyEventBone.append(sPrefix)
                         unReadyEvent.remove(sPrefix+'_start')
                         unReadyEvent.remove(sPrefix+'_end')
                     else:
@@ -155,9 +161,10 @@ def checkAllEvent(vAniEvent, vSlot, vBone):
 
         except :
             pass
-    readyEvent.sort()
+    readyEventSlot.sort()
+    readyEventBone.sort()
     unReadyEvent.sort()
-    return readyEvent,unReadyEvent
+    return readyEventSlot,readyEventBone, unReadyEvent
 
 # 是否以字符串s为结尾的
 def endsIndex(s, sub):
