@@ -143,13 +143,13 @@ def checkAllEvent(vAniEvent, vSlot, vBone):
                 # 事件中存在 xxx_start和xxx_end 且 只出现了一次
                 if obj['start'] == obj['end'] and obj['start'] == 1:
                     # if vSlot.get(sPrefix) and vBone.get(sPrefix):
-                    # 只判断插槽是否存在即可  动效的骨骼和插槽名可能会不一样
-                    if vSlot.get(sPrefix) :
+                    # 只判断插槽、骨骼是否存在即可  动效的骨骼和插槽名可能会不一样
+                    if vSlot.get(sPrefix) or vBone.get(sPrefix):
                         readyEvent.append(sPrefix)
                         unReadyEvent.remove(sPrefix+'_start')
                         unReadyEvent.remove(sPrefix+'_end')
                     else:
-                        print(LEVEL_2 + Fore.RED + u'事件【' + sPrefix + u'_start/end】符合规则，但不存在插槽名叫 【' + sPrefix + u'】'+ Fore.RESET)
+                        print(LEVEL_2 + Fore.RED + u'事件【' + sPrefix + u'_start/end】符合规则，但不存在插槽/骨骼名叫 【' + sPrefix + u'】'+ Fore.RESET)
                 else:
                     print(LEVEL_2 + Fore.RED + u'事件【xxx_start/end】出现多次'+ Fore.RESET)
 

@@ -4,4 +4,4 @@ util/wweather/conf.json
 *.apks
 *.aab
 util/wpop/conf.json
-linkCmd/conf.json
+installAAB
