@@ -23,7 +23,11 @@ def checkAnimation(animations, vSlot, vBone, vAtt):
     for ani in animations:
         vAnimation.append(ani)
         vAniAttFrame = checkAnimationAttFrame(animations, ani)
-        print(LEVEL_1 + u'动画名: ' + Fore.GREEN + ani + Fore.RESET )
+        try:
+            int(ani)
+            print(LEVEL_1 + Fore.RED + u'动画名不要用数字: ' + ani + Fore.RED)
+        except:
+            print(LEVEL_1 + u'动画名: ' + Fore.GREEN + ani + Fore.RESET )
         vReadyEventSlot = []
         vReadyEventBone = []
         vUnReadyEvent = []
