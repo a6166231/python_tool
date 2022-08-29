@@ -1,11 +1,19 @@
 #!/usr/bin/python
 #-*- coding: utf-8 -*-
 
-import json, os, colorama
+import json, os, colorama,sys
 from colorama import Fore
-
 colorama.init(autoreset=True)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+bIsDir = True
+sFilePath = ''
+try:
+    sFilePath = sys.argv[1]
+    bIsDir = False
+except:
+    pass
+
 SPINE_COMPLETE_EVENT_NAME = "end_point1"
 SPINE_EVENT_START_NAME = "_start"
 SPINE_EVENT_END_NAME = "_end"
@@ -249,10 +257,15 @@ def checkJson(root,file):
     return succ
 
 total = 0
-for root,dirs,files in os.walk('.'):
-    for file in files:
-        if file.endswith(".json"):
-            if checkJson(root,file):
-                total+=1
+if bIsDir:
+    for root,dirs,files in os.walk('.'):
+        for file in files:
+            if file.endswith(".json"):
+                if checkJson(root,file):
+                    total+=1
+else:
+    if sFilePath.endswith(".json"):
+        if checkJson(os.path.dirname(sFilePath),os.path.basename(sFilePath)):
+            total+=1
 print("total spine number: " + Fore.GREEN + str(total) + Fore.RESET)
 os.system('pause')
