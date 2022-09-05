@@ -76,6 +76,7 @@ if(conf["buildASTC"]):
     f.close()
     cfg['cocosCreatorRoot'] = conf["cocosCreatorRoot"]
     cfg['useFastest'] = conf["useFastest"]
+    cfg['updateBG'] = conf["updateBG"]
     f = open(T_CONFIG_JSON, 'w')
     f.write(json.dumps(cfg,indent=4))
     f.close()
