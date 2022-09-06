@@ -1,4 +1,6 @@
-import os,json,glob,shutil,time,socket
+# -*- coding: utf-8 -*-
+
+import os,json,glob,shutil,time,socket,subprocess
 from win10toast import ToastNotifier
 from colorama import Fore
 
@@ -66,6 +68,45 @@ def copyDir(src, dst,std=False,mt=20):
 def copyFile(start,end):
     shutil.copy(start, end)
 
+
+def readonly_handler(func,path,execinfo):
+    os.chmod(path,128)
+    func(path)
+
+def svnCheckout(sURL, sLoc, fileName=''):
+    if(os.path.exists(sLoc)):
+        shutil.rmtree(sLoc, onerror=readonly_handler)
+    os.mkdir(sLoc)
+    f2 = open(T_CONFIG_JSON)
+    conf2 = json.loads(f2.read())
+    f2.close()
+    sCommondLine = 'svn checkout ' + sURL + ' ' + sLoc + ' --username=' + conf2['svnUserName'] + ' --password=' + conf2['svnPassword']
+    if(fileName != ''):
+        sCommondLine = 'svn checkout ' + sURL + ' ' + sLoc + ' --depth=empty --username=' + conf2['svnUserName'] + ' --password=' + conf2['svnPassword']
+    sLogPath = './svn.log'
+    f = open(sLogPath, 'w')
+    p = subprocess.Popen(sCommondLine, shell=True, stdout=f)
+    p.wait()
+    f.flush()
+    f.close()
+    f = open(sLogPath, 'r')
+    data = f.read()
+    f.close()
+    if(data.find(u'取出版本'.encode('gbk')) == -1):
+        print('svn checkout failed: ' + sURL)
+        os.system('pause')
+        exit(4)
+    if(fileName != ''):
+        sCommondLine = 'svn up ' + sLoc + '/' +fileName
+        f = open(sLogPath, 'w')
+        p = subprocess.Popen(sCommondLine, shell=True, stdout=f)
+        p.wait()
+        f.flush()
+        f.close()
+        f = open(sLogPath, 'r')
+        data = f.read()
+        f.close()
+
 if(conf["buildASTC"]):
     print("-1. start build astc~")
     pathExist(T_PPATH)
@@ -74,9 +115,20 @@ if(conf["buildASTC"]):
     f = open(T_CONFIG_JSON)
     cfg = json.loads(f.read())
     f.close()
+    
+    BG_SVN = cfg['bgSVN']
+    CONF_SVN = cfg['confSVN']
+    CONF_NAME = cfg['confName']
+
+
     cfg['cocosCreatorRoot'] = conf["cocosCreatorRoot"]
     cfg['useFastest'] = conf["useFastest"]
     cfg['updateBG'] = conf["updateBG"]
+
+    if not cfg['updateBG']:
+        svnCheckout(BG_SVN, './bg')
+        svnCheckout(CONF_SVN, './conf', CONF_NAME)
+        
     f = open(T_CONFIG_JSON, 'w')
     f.write(json.dumps(cfg,indent=4))
     f.close()

@@ -17,13 +17,13 @@
         "3": "close",
         "4": "sendemail -e 361385654@qq.com -t build -m buildOver"
     },
-    "endCallIndex": 0,
+    "endCallIndex": 2,
     "install": false,
     "setLight": -1,
 
     "--------------------------": "--------------------------",
 
-    "buildASTC": false,
+    "buildASTC": true,
     "copyToClient": false,
 
     "buildPackage": true,
