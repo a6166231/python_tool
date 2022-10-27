@@ -57428,13 +57428,10 @@ p.footer {
       Mode.prototype._initDC = function() {
         var _this = this;
         var _a;
-        var debugNode;
-        if (this._spine.debugBones || this._spine.debugSlots) {
-          debugNode = null === (_a = this._spine["_debugRenderer"]) || void 0 === _a ? void 0 : _a.node;
-          if (debugNode) {
-            debugNode.parent = this.node;
-            debugNode.opacity = 1;
-          }
+        var debugNode = null === (_a = this._spine["_debugRenderer"]) || void 0 === _a ? void 0 : _a.node;
+        if (debugNode && (this._spine.debugBones || this._spine.debugSlots || this.spine.debugMesh)) {
+          debugNode.parent = this.node;
+          debugNode.opacity = 1;
         }
         for (var _i = 0, _b = this.vRenderNode; _i < _b.length; _i++) {
           var item = _b[_i];
@@ -57447,10 +57444,10 @@ p.footer {
             var item = _a[_i];
             item.active = true;
           }
-          if (debugNode) {
+          if (debugNode) if (_this._spine.debugBones || _this._spine.debugSlots || _this.spine.debugMesh) {
             debugNode.parent = _this._spine.node;
             debugNode.opacity = 255;
-          }
+          } else debugNode.parent = null;
         });
       };
       Mode.prototype._initListener = function() {
@@ -57472,6 +57469,7 @@ p.footer {
         newSp.active = true;
         this._spine = newSp.getComponent(sp.Skeleton);
         this.setAnimation(this._spine.animation, this._spine.loop);
+        this._initDebugRenderer();
       };
       Mode.prototype._initDebugRenderer = function() {
         var debugDrawNode = new cc.PrivateNode();
@@ -57479,8 +57477,11 @@ p.footer {
         var debugDraw = debugDrawNode.addComponent(cc.Graphics);
         debugDraw.lineWidth = 1;
         debugDraw.strokeColor = cc.color(255, 0, 0, 255);
+        debugDraw.moveTo(999999, 99999);
+        debugDraw.lineTo(999999, 1e5);
+        debugDraw.close();
+        debugDraw.stroke();
         this._spine["_debugRenderer"] = debugDraw;
-        this._spine["_debugRenderer"].parent = this._spine.node;
       };
       Mode.prototype.setAnimation = function(sAniName, bLoop) {
         void 0 === bLoop && (bLoop = true);
@@ -57860,6 +57861,7 @@ p.footer {
       };
       Property.prototype._onSelectUseTint = function() {
         this._spine.useTint = this.useTint.isChecked;
+        this._initDc();
       };
       Property.prototype._onTimeScaleChanged = function(editbox) {
         this._spine.timeScale = Number(editbox.string) || 1;
@@ -57900,7 +57902,20 @@ p.footer {
     sp.Skeleton.prototype.clearAllSelectData = function() {
       this.onSelectData.bone.clear();
     };
-    sp.Skeleton.prototype.selectSlot = function(sSlotName) {
+    sp.Skeleton.prototype["_updateDebugDraw"] = function() {
+      if (this.debugBones || this.debugSlots) {
+        if (!this._debugRenderer) {
+          var debugDrawNode = new cc.PrivateNode();
+          debugDrawNode.name = "DEBUG_DRAW_NODE";
+          var debugDraw = debugDrawNode.addComponent(cc.Graphics);
+          debugDraw.lineWidth = 1;
+          debugDraw.strokeColor = cc.color(255, 0, 0, 255);
+          this._debugRenderer = debugDraw;
+        }
+        this._debugRenderer.node.parent = this.node;
+        this.isAnimationCached() && cc.warn("Debug bones or slots is invalid in cached mode");
+      } else this._debugRenderer && (this._debugRenderer.node.parent = null);
+    }, sp.Skeleton.prototype.selectSlot = function(sSlotName) {
       var _this = this;
       var slot = _this.findSlot(sSlotName);
       if (!slot) {
