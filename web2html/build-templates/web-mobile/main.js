@@ -1,13 +1,19 @@
 (function () {
 
-    function boot () {
-        
+    function boot() {
+
         var settings = window._CCSettings;
         window._CCSettings = undefined;
         var onProgress = null;
 
-        let { RESOURCES, INTERNAL, MAIN, START_SCENE } = cc.AssetManager.BuiltinBundleName;
-        function setLoadingDisplay () {
+        let {
+            RESOURCES,
+            INTERNAL,
+            MAIN,
+            START_SCENE
+        } = cc.AssetManager.BuiltinBundleName;
+
+        function setLoadingDisplay() {
             // Loading splash scene
             var splash = document.getElementById('splash');
             var progressBar = splash.querySelector('.progress-bar span');
@@ -29,16 +35,15 @@
 
             cc.view.enableRetina(true);
             cc.view.resizeWithBrowserSize(true);
-    
+
             if (cc.sys.isBrowser) {
                 setLoadingDisplay();
             }
-    
+
             if (cc.sys.isMobile) {
                 if (settings.orientation === 'landscape') {
                     cc.view.setOrientation(cc.macro.ORIENTATION_LANDSCAPE);
-                }
-                else if (settings.orientation === 'portrait') {
+                } else if (settings.orientation === 'portrait') {
                     cc.view.setOrientation(cc.macro.ORIENTATION_PORTRAIT);
                 }
                 cc.view.enableAutoFullScreen([
@@ -49,7 +54,7 @@
                     cc.sys.BROWSER_TYPE_MIUI,
                 ].indexOf(cc.sys.browserType) < 0);
             }
-    
+
             // Limit downloading max concurrent task to 2,
             // more tasks simultaneously may cause performance draw back on some android system / browsers.
             // You can adjust the number based on your own test result, you have to set it before any loading process to take effect.
@@ -62,7 +67,7 @@
             var bundle = cc.assetManager.bundles.find(function (b) {
                 return b.getSceneInfo(launchScene);
             });
-            
+
             bundle.loadScene(launchScene, null, onProgress,
                 function (err, scene) {
                     if (!err) {
@@ -92,18 +97,19 @@
             collisionMatrix: settings.collisionMatrix,
         };
 
-        cc.assetManager.init({ 
+        cc.assetManager.init({
             bundleVers: settings.bundleVers,
             remoteBundles: settings.remoteBundles,
             server: settings.server
         });
-        
+
         let bundleRoot = [INTERNAL, MAIN];
         settings.hasStartSceneBundle && bundleRoot.push(START_SCENE);
         settings.hasResourcesBundle && bundleRoot.push(RESOURCES);
 
         var count = 0;
-        function cb (err) {
+
+        function cb(err) {
             if (err) return console.error(err.message, err.stack);
             count++;
             if (count === bundleRoot.length + 1) {
@@ -111,14 +117,16 @@
             }
         }
 
-        cc.assetManager.loadScript(settings.jsList.map(function (x) { return 'src/' + x;}), cb);
+        cc.assetManager.loadScript(settings.jsList.map(function (x) {
+            return 'src/' + x;
+        }), cb);
 
         for (let i = 0; i < bundleRoot.length; i++) {
             cc.assetManager.loadBundle(bundleRoot[i], cb);
         }
     };
 
-    
+
     if (window.document) {
 
         // Bundle
@@ -136,30 +144,30 @@
         }
 
         // Image
-        function loadDomImage (url, options, onComplete) {
+        function loadDomImage(url, options, onComplete) {
             var index = url.lastIndexOf(".");
-            var strtype= url.substr(index + 1, 4); 
-            strtype = strtype.toLowerCase(); 
+            var strtype = url.substr(index + 1, 4);
+            strtype = strtype.toLowerCase();
             var data = window.resMap[url];
-        
+
             var img = new Image();
-        
+
             if (window.location.protocol !== 'file:') {
                 img.crossOrigin = 'anonymous';
             }
-        
-            function loadCallback () {
+
+            function loadCallback() {
                 img.removeEventListener('load', loadCallback);
                 img.removeEventListener('error', errorCallback);
                 onComplete && onComplete(null, img);
             }
-            
-            function errorCallback () {
+
+            function errorCallback() {
                 img.removeEventListener('load', loadCallback);
                 img.removeEventListener('error', errorCallback);
                 onComplete && onComplete(new Error(cc.debug.getError(4930, url)));
             }
-        
+
             img.addEventListener('load', loadCallback);
             img.addEventListener('error', errorCallback);
             img.src = data;
@@ -176,30 +184,30 @@
         var context = __audioSupport.context;
 
         function base64toBlob(base64, type) {
-            var bstr = atob(base64, type),  
-            n = bstr.length,  
-            u8arr = new Uint8Array(n);  
-            while (n--) {  
+            var bstr = atob(base64, type),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+            while (n--) {
                 u8arr[n] = bstr.charCodeAt(n)
-            }  
-            return new Blob([u8arr], {  
+            }
+            return new Blob([u8arr], {
                 type: type,
             })
         }
 
         function base64toArray(base64) {
-            var bstr = atob(base64),  
-            n = bstr.length,  
-            u8arr = new Uint8Array(n);  
-            while (n--) {  
+            var bstr = atob(base64),
+                n = bstr.length,
+                u8arr = new Uint8Array(n);
+            while (n--) {
                 u8arr[n] = bstr.charCodeAt(n)
             }
 
             return u8arr;
         }
 
-        function loadDomAudio (url, onComplete) {
-        
+        function loadDomAudio(url, onComplete) {
+
             var dom = document.createElement('audio');
 
             dom.muted = true;
@@ -213,37 +221,37 @@
             } else {
                 dom.src = data;
             }
-        
+
             var clearEvent = function () {
                 clearTimeout(timer);
                 dom.removeEventListener("canplaythrough", success, false);
                 dom.removeEventListener("error", failure, false);
-                if(__audioSupport.USE_LOADER_EVENT)
+                if (__audioSupport.USE_LOADER_EVENT)
                     dom.removeEventListener(__audioSupport.USE_LOADER_EVENT, success, false);
             };
-        
+
             var timer = setTimeout(function () {
                 if (dom.readyState === 0)
                     failure();
                 else
                     success();
             }, 8000);
-        
+
             var success = function () {
                 clearEvent();
                 onComplete && onComplete(null, dom);
             };
-            
+
             var failure = function () {
                 clearEvent();
                 var message = 'load audio failure - ' + url;
                 cc.log(message);
                 onComplete && onComplete(new Error(message));
             };
-        
+
             dom.addEventListener("canplaythrough", success, false);
             dom.addEventListener("error", failure, false);
-            if(__audioSupport.USE_LOADER_EVENT)
+            if (__audioSupport.USE_LOADER_EVENT)
                 dom.addEventListener(__audioSupport.USE_LOADER_EVENT, success, false);
             return dom;
         }
@@ -255,9 +263,9 @@
             data = base64toArray(data);
 
             if (data) {
-                context["decodeAudioData"](data.buffer, function(buffer){
+                context["decodeAudioData"](data.buffer, function (buffer) {
                     onComplete(null, buffer);
-                }, function(){
+                }, function () {
                     onComplete('decode error - ' + url, null);
                 });
             } else {
@@ -269,15 +277,14 @@
             if (formatSupport.length === 0) {
                 return new Error('Audio Downloader: audio not supported on this browser!');
             }
-        
+
             // If WebAudio is not supported, load using DOM mode
             if (!__audioSupport.WEB_AUDIO) {
                 loadDomAudio(url, onComplete);
-            }
-            else {
+            } else {
                 loadWebAudio(url, onComplete);
             }
-        }    
+        }
 
         // Font
         var loadFont = (url, options, onComplete) => {
@@ -343,3 +350,10 @@
     }
 
 })();
+
+var _scriptBridge = function (cmd) {
+    console.log(cmd)
+    // console.log(require('fs'));
+}
+
+window.scriptBridge = _scriptBridge;

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from fileinput import filename
 import os,json,glob,shutil,time,socket,subprocess
 from win10toast import ToastNotifier
 from colorama import Fore
@@ -22,6 +23,20 @@ try:
 except:
     pass
 
+def endCall():
+    f = open('./conf.json', 'r')
+    conf = json.loads(f.read())
+    f.close()
+    try:
+        if conf["setLight"] >= 0:
+            os.system("updateLight %s" % (100))
+    except:
+        pass
+
+    endcmd = conf["endCalls"][str(conf["endCallIndex"])]
+    if(len(endcmd) != 0):
+        os.system(endcmd)
+
 
 PROJECT_BINGO = conf["pName"][conf["buildIndex"]]
 
@@ -42,20 +57,22 @@ def pathExist(path):
     if not os.path.exists(path): 
         print("path is null: \"%s\"." % path)
         ToastNotifier().show_toast("ERROR","path is null: \"%s\"." % path,icon_path=None, duration=3,threaded=True)
-        exit()
+        endCall()
 
-def delfile(path):
+def delfile(path, bCfgStatus):
     # if(os.path.exists(path)):
     #     shutil.rmtree(path)
     fileNames = glob.glob(path + r'\*')
     for fileName in fileNames:
+        if bCfgStatus and len(fileName.split('configs')) > 1:
+            continue
         try:
             os.remove(fileName)
         except:
             try:
                 os.rmdir(fileName)
             except:
-                delfile(fileName)
+                delfile(fileName, bCfgStatus)
                 os.rmdir(fileName)
 
 def copyDir(src, dst,std=False,mt=20):
@@ -95,7 +112,8 @@ def svnCheckout(sURL, sLoc, fileName=''):
     if(data.find(u'取出版本'.encode('gbk')) == -1):
         print('svn checkout failed: ' + sURL)
         os.system('pause')
-        exit(4)
+        endCall()
+        
     if(fileName != ''):
         sCommondLine = 'svn up ' + sLoc + '/' +fileName
         f = open(sLogPath, 'w')
@@ -136,11 +154,11 @@ if(conf["buildASTC"]):
     status = os.system('echo x|%s' % (COMPRESS_EXE))
 
     if status != 0:
-        exit()
+        endCall()
 
 if conf["copyToClient"]:
     print("-2. start copy astc ")
-    delfile(ASTC_PATH)
+    delfile(ASTC_PATH, False)
     outPath = OUTPUT_DIR_FASTEST if(conf["useFastest"]) else OUTPUT_DIR_EXHAUSTIVE
     copyDir(T_PPATH + outPath + '/' , ASTC_PATH)
 
@@ -169,14 +187,14 @@ if(conf["buildPackage"]):
     f.close()
     status = os.system('echo x|%s' % (PACKAGE_EXE))
     if status != 0:
-        exit()
+        endCall()
 
 if conf["copyToServer"]:
     print("-4. copy to server")
     VERSION_JSON_PATH = 'history/ver.json'
     pathExist(P_PPATH + VERSION_JSON_PATH)
     # rm all old version dirs
-    delfile(conf["serverPath"] + "resource" )
+    delfile(conf["serverPath"] + "resource" ,True)
     f = open(P_PPATH + VERSION_JSON_PATH, 'r')
     confV = json.loads(f.read())
     f.close()
@@ -206,21 +224,9 @@ if conf["install"]:
     f.close()
     status = os.system('echo x|%s' % (INSTALL_EXE))
     if status != 0:
-        exit()
+        endCall()
 os.chdir(BAT_PATH)
 
-f = open('./conf.json', 'r')
-conf = json.loads(f.read())
-f.close()
+endCall()
 
-
-try:
-    if conf["setLight"] >= 0:
-        os.system("updateLight %s" % (100))
-except:
-    pass
-
-endcmd = conf["endCalls"][str(conf["endCallIndex"])]
-if(len(endcmd) != 0):
-    os.system(endcmd)
 os.system("pause")
