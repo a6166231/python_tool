@@ -1,0 +1,10 @@
+[{
+        "cmd": "rmMeta",
+        "desc": "删除当前文件夹下所有文件meta"
+    },
+    {
+        "cmd": "updateLight",
+        "desc": "修改屏幕亮度",
+        "parmas": ["目标亮度"]
+    }
+]
