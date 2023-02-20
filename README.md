@@ -9,19 +9,33 @@
    - 用到的的图集尺寸 `(对尺寸超过2048x2048的图集 输出警告)`
    - 所有可以执行 **_替换插槽_**  逻辑的插槽名 `(对某些动画中存在影响替换插槽的 -附件帧- 输出警告 )`
    - 动画中存在的帧事件 `(本项目中存在普通帧事件、符合开发命名规则的帧事件，对不符合开发规则的事件 输出警告)`
+   - 支持对指定文件的检测，支持文件夹下多文件检测
    
+   - https://user-images.githubusercontent.com/32084033/220075140-aeccf210-6a64-4c1c-a5b5-c72f325708bf.mp4
+
+
 ## previewCurve ##
 **_右键json文件快速预览spine动效_**
 **_只展示spine的dc，无其他元素渲染影响_**
 -  window可将该插件写入 *右键* 注册表，方便在多文件夹下操作
 -  (preview) spine动效预览模式，实现控制spine播放进度（类似视频播放器进度条）
 -  (curve) spine动效飞行曲线预览模式，实现可视化修改调整spine骨骼点，动效实现效果，程序调整骨骼坐标即可
+
+   -  curveDemo：操作骨骼调整曲线动画demo
+
+   -  https://user-images.githubusercontent.com/32084033/220071806-449d21a9-ecd9-41b2-96bd-2ca94502d84e.mp4
+
 -  (replace) spine插槽替换预览模式，实现可视化替换资源到spine的插槽中（实现替换插槽和还原插槽）
+
+   -  replaceDemo：替换插槽demo
+
+   -  https://user-images.githubusercontent.com/32084033/220016493-d3e76cb4-a847-469f-a696-a0b0e6a0eff9.mp4
 
 -  todo
    - (follow) 骨骼/插槽跟随模式，实现可视化生成节点到spine的骨骼/插槽位置，并根据骨骼/插槽的（坐标，缩放，旋转，透明度，颜色）属性变化而变化
    
 ## system ##
+
 **_用py实现一些cmd命令行打包成exe文件，并将本文件夹配置到环境变量中，就可以在cmd下快捷调用实现的脚本_**
 - 目前包括：
 
