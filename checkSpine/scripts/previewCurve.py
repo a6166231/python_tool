@@ -2,9 +2,9 @@
 #-*- coding: utf-8 -*-
 import re
 import webbrowser
-import json, os, colorama,sys,subprocess
+import json, os, colorama,sys
 from colorama import Fore
-from selenium import webdriver
+# from selenium import webdriver
 reload(sys)
 sys.setdefaultencoding('utf-8')
 colorama.init(autoreset=True)
@@ -85,12 +85,25 @@ for spine in cfg:
         s[key] = base64.b64encode(f.read()) 
     cfg[spine]['png'] = str(s)
     f.close()
+
+SPINE_TAR_STR = 'window.previewSpinePath'
+
 batPath = os.path.join(os.path.dirname(sys.argv[0]),'index.html')
 f = open(batPath,'r+')
 flist=f.readlines()
 f.close()
 f = open(batPath,'w+')
-flist[178]='window.previewSpinePath='+json.dumps(cfg)+'\n'
+lines = 0
+for line in flist:
+    try:
+        index = line.index(SPINE_TAR_STR)
+        if index != -1:
+            print(lines)
+            flist[178] = SPINE_TAR_STR + '=' + json.dumps(cfg)+'\n'
+            break
+    except:
+        pass
+    lines = lines + 1
 f.writelines(flist)
 f.close()
 webbrowser.open(batPath)
