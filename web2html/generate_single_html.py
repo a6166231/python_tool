@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 import json
 import os
-from html.parser import HTMLParser
 import base64
 import simplejson
 import math
@@ -39,6 +38,8 @@ def read_in_chunks(filePath):
     elif extName == '':
         return None
 
+    fsize = os.path.getsize(filePath)
+    print(filePath + ' size : ' + str(math.ceil(fsize * 1000 / (1024 * 1024)) / 1000) + 'mb')
     file_object = open(filePath)
     return file_object.read()
 
@@ -82,6 +83,8 @@ def integrate(projectRootPath, newHtmlPath):
     projectScrPath = projectRootPath + '/build/web-mobile/assets/main/index.js'
     resPath = projectRootPath + '/build/web-mobile/assets'
     indexInternalScrPath = projectRootPath + '/build/web-mobile/assets/internal/index.js'
+
+
 
     htmlStr = read_in_chunks(htmlPath)
     settingsStr = read_in_chunks(settingScrPath)
