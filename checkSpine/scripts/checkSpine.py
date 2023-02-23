@@ -3,6 +3,8 @@
 
 import json, os, colorama,sys
 from colorama import Fore
+reload(sys)
+sys.setdefaultencoding('utf-8')
 colorama.init(autoreset=True)
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
