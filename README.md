@@ -70,3 +70,14 @@
 - 用python实现的工具类
 - addWinPath.py可以将util工具类导入python库，就可以在其他路径下的python脚本中引用该util类
 - 包含了发邮件，获取天气预报，修改显示屏亮度等功能的实现
+
+## excel2ts ##  
+- excel文件转声明文件
+- 目前只测试了 *.csv, *.xls
+```
+XXXConfig.ts
+export interface XXXConfig {
+   /** 注释 */
+   xxx: number;
+}
+```
