@@ -74,6 +74,11 @@
 ## excel2ts ##  
 - excel文件转声明文件
 - 目前只测试了 *.csv, *.xls
+   - cfg.json 配置表格的注释，类型，属性，数据的所在行
+      - desc_line: 对应的ts中的属性的注释
+      - type_line: 对应的ts中的属性的类型
+      - param_line: 对应的ts中的属性名
+      - data_line: excal的数据的开始行
 ```
 XXXConfig.ts
 export interface XXXConfig {
