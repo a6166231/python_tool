@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 import pandas as pd
-import os,json
+import os,json,sys
 
-BAT_PATH = os.path.dirname(os.path.abspath(__file__))
-os.chdir(BAT_PATH)
+if getattr(sys, 'frozen', False):
+    absPath = os.path.dirname(os.path.abspath(sys.executable))
+elif __file__:
+    absPath = os.path.dirname(os.path.abspath(__file__))
+
+os.chdir(absPath)
+
 
 f = open(os.path.join('./cfg.json'),'r',encoding='utf-8')
 cfgJson = json.loads(f.read())

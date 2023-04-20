@@ -1,0 +1,1 @@
+reg delete "HKEY_CLASSES_ROOT\SystemFileAssociations\.py\shell\www" /f

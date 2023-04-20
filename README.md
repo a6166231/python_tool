@@ -81,3 +81,8 @@ export interface XXXConfig {
    xxx: number;
 }
 ```
+
+## py2exe ##
+- 将python脚本通过pyinstaller打包成exe文件，即可无py环境运行
+   - 添加右键快捷（管理员运行）.bat 将py2exe加入 *.py 文件的右键列表中，方便在任意文件夹下一键 .py文件转.exe
+   - 删除右键快捷（管理员运行）.bat  删除.py文件的py2exe删除掉
