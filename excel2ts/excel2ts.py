@@ -27,6 +27,9 @@ ANY = 'any'
 NUMBER = 'number'
 ARRAY = 'Array<%>'
 STRNIG = 'string'
+LONG = 'Long'
+
+LONGPATH = 'import { Long } from "../net/Long";\n\n'
 
 TYPE_DICT = {
     'int': NUMBER,
@@ -34,7 +37,8 @@ TYPE_DICT = {
     'float': NUMBER,
     'short': NUMBER,
     'double': NUMBER,
-    'long': NUMBER,
+    'long': LONG,
+    'Long': LONG,
     
     'uint': NUMBER,
     'ushort': NUMBER,
@@ -46,13 +50,18 @@ TYPE_DICT = {
 TYPE_PY = {
     int: NUMBER,
     float: NUMBER,
-
     str: STRNIG,
 }
+
+bAddLongImport = False
 
 def getTypeByStr(s, p = []):
     try:
         val = TYPE_DICT[s]
+        if val == LONG:
+            print('addLong~~~')
+            global bAddLongImport
+            bAddLongImport = True
         return val
     except:
         return ANY
@@ -109,6 +118,9 @@ def formatExcel(file_name:str):
 
     if not os.path.exists(OPATH):
         os.makedirs(OPATH)
+
+    if  bAddLongImport:
+        ts_text = LONGPATH + ts_text
 
     with open("%s/%s.ts" % (OPATH ,CLS_NAME), "w", encoding='utf-8') as f:
         f.write(ts_text)
