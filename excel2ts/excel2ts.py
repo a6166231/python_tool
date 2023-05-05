@@ -59,7 +59,7 @@ def getTypeByStr(s, p = []):
     try:
         val = TYPE_DICT[s]
         if val == LONG:
-            print('addLong~~~')
+            print('       - import Long')
             global bAddLongImport
             bAddLongImport = True
         return val
@@ -84,7 +84,33 @@ def formatClsName(className):
         if len(names[index]) > 0:
             names[index] = names[index][0].upper()+ names[index][1:]
     return "".join(names) +'Config'
-d = {}
+
+data = {}
+
+# 试图通过不同的编码格式打开excal
+def TryOpenExl(fp):
+    global data
+    encodes = ['','gbk','utf-8']
+    result = -1
+    for code in encodes:
+        try:
+            if len(code) == 0:
+                data = pd.read_csv(fp,header=None)
+            else :
+                data = pd.read_csv(fp,header=None,encoding=code)
+            result = 1
+            break
+        except:
+            try:
+                if len(code) == 0:
+                    data = pd.read_excel(fp,header=None)
+                else :
+                    data = pd.read_excel(fp,header=None,encoding=code)
+                result = 2
+                break
+            except:
+                pass
+    return result
 
 def formatExcel(file_name:str):
     fp = os.path.join(FPATH, file_name)
@@ -93,14 +119,10 @@ def formatExcel(file_name:str):
     EXCEL_NAME = file_name.split(".")[0]
     CLS_NAME = formatClsName(EXCEL_NAME)
 
-    try:
-        data = pd.read_csv(fp,header=None)
-    except:
-        try:
-            data = pd.read_excel(fp,header=None)
-        except:
-            print('cant open excel file!  ',fp)
-            return
+    result = TryOpenExl(fp)
+    if result < 0:
+        print('cant open excel file!  ',fp)
+        return
 
     columns = data.columns.tolist()
     ts_text += " * \n"
