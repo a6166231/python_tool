@@ -39,7 +39,7 @@ TYPE_DICT = {
     'double': NUMBER,
     'long': LONG,
     'Long': LONG,
-    
+
     'uint': NUMBER,
     'ushort': NUMBER,
     'ubyte': NUMBER,
@@ -114,21 +114,18 @@ def TryOpenExl(fp):
 
 def formatExcel(file_name:str):
     fp = os.path.join(FPATH, file_name)
-    ts_text = "/**\n"
 
-    EXCEL_NAME = file_name.split(".")[0]
+    EXCEL_NAME = os.path.basename(file_name.split(".")[0])
     CLS_NAME = formatClsName(EXCEL_NAME)
-
     result = TryOpenExl(fp)
     if result < 0:
         print('cant open excel file!  ',fp)
         return
 
     columns = data.columns.tolist()
-    ts_text += " * \n"
-    ts_text += " * excel : %s\n" % (EXCEL_NAME)
-    ts_text+=' */\n'
-
+    #头部注释
+    ts_text = "/**\n * \n * excel : %s\n */\n" % (EXCEL_NAME)
+    #export interface部分
     ts_text+= 'export interface %s {\n' % CLS_NAME
     for i in columns:
         ts_text += '\t/** %s */\n' % data.at[DESC_INDEX, i]
@@ -141,15 +138,60 @@ def formatExcel(file_name:str):
     if not os.path.exists(OPATH):
         os.makedirs(OPATH)
 
+    global bAddLongImport
     if  bAddLongImport:
         ts_text = LONGPATH + ts_text
+        bAddLongImport = False
 
     with open("%s/%s.ts" % (OPATH ,CLS_NAME), "w", encoding='utf-8') as f:
         f.write(ts_text)
     print('output %s.ts ' % CLS_NAME)
 
-for file_name in os.listdir(FPATH):
-    formatExcel(file_name)
+if os.path.isdir(FPATH):
+    for file_name in os.listdir(FPATH):
+        formatExcel(file_name)
+elif os.path.isfile(FPATH):
+    formatExcel(FPATH)
+else:
+    print('cfg[excel_path] is error: -- ' + FPATH)
+# import subprocess
+
+# INFO_PATH = '%s/_info.txt' % OPATH
+# ERROR_PATH = '%s/_error.txt' % OPATH
+
+# def checkTsLint():
+#     print('- start ts check - ')
+    
+#     f = open(INFO_PATH,'w')
+#     f.write('')
+#     f.close()
+#     f = open(ERROR_PATH,'w')
+#     f.write('')
+#     f.close()
+
+#     # try:
+#     if not os.path.exists('%s/tsconfig.json' % (OPATH)):
+#         os.chdir(OPATH)
+#         cmd = 'tsc --init'
+#         p = subprocess.Popen(cmd,shell=False,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+#         p.wait()
+#         p.kill()
+        
+#         # os.system(cmd)
+#     cmd = 'tsc -p %s --outDir %s/tsc' % (OPATH,OPATH)
+#     f = open(INFO_PATH)
+#     p = subprocess.Popen(cmd,shell=False,stdout=f,stderr=subprocess.STDOUT)
+#     p.wait()
+#     p.kill()
+#     # except:
+#     #     print('hava no tsc, check fail! ')
+#     print('- check over - ')
+
+# try:
+#     if cfgJson["bCheckError"]:
+#         checkTsLint()
+# except:
+#     pass
 
 print('\n - over - ')
 os.system('pause')
