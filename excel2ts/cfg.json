@@ -1,4 +1,11 @@
 {
+    "note1":"excel_path可直接配置tables.xls表路径，默认遍历name列中配置的excal文件",
+    "note2":"excel_path配置文件夹路径，默认遍历文件夹下所有excal文件",
+    "note3":"out_path配置ts文件输出路径",
+    "note4":"desc_line为描述的行号，type_line为字段类型的行号，param_line为字段名，data_line为数据行",
+    "note5":"type_line如果没有数据的话，会根据data_line的数据尝试判断一次类型，失败后会默认any类型",
+
+
     "excel_path": "",
     "out_path": "",
 

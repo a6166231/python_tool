@@ -84,14 +84,12 @@ def formatClsName(className):
         if len(names[index]) > 0:
             names[index] = names[index][0].upper()+ names[index][1:]
     return "".join(names) +'Config'
-
-data = {}
-
+# data = {}
 # 试图通过不同的编码格式打开excal
 def TryOpenExl(fp):
-    global data
     encodes = ['','gbk','utf-8']
     result = -1
+    data = {}
     for code in encodes:
         try:
             if len(code) == 0:
@@ -110,16 +108,16 @@ def TryOpenExl(fp):
                 break
             except:
                 pass
-    return result
+    if result < 0:
+        print('cant open excel file!  ',FPATH)
+    return result,data
 
 def formatExcel(file_name:str):
     fp = os.path.join(FPATH, file_name)
-
     EXCEL_NAME = os.path.basename(file_name.split(".")[0])
     CLS_NAME = formatClsName(EXCEL_NAME)
-    result = TryOpenExl(fp)
+    result,data = TryOpenExl(fp)
     if result < 0:
-        print('cant open excel file!  ',fp)
         return
 
     columns = data.columns.tolist()
@@ -131,7 +129,10 @@ def formatExcel(file_name:str):
         ts_text += '\t/** %s */\n' % data.at[DESC_INDEX, i]
         ptype = getTypeByStr(data.at[TYPE_INDEX, i])
         if ptype == ANY:
-            ptype = getValueType(data.at[DATA_INDEX, i])
+            try:
+                ptype = getValueType(data.at[DATA_INDEX, i])
+            except:
+                pass
         ts_text += '\t%s: %s;\n' % (data.at[PARAM_INDEX, i], ptype)
     ts_text+= '}\n'
 
@@ -145,15 +146,43 @@ def formatExcel(file_name:str):
 
     with open("%s/%s.ts" % (OPATH ,CLS_NAME), "w", encoding='utf-8') as f:
         f.write(ts_text)
+    global tsCount
+    tsCount+=1
     print('output %s.ts ' % CLS_NAME)
 
-if os.path.isdir(FPATH):
-    for file_name in os.listdir(FPATH):
-        formatExcel(file_name)
-elif os.path.isfile(FPATH):
-    formatExcel(FPATH)
+tsCount=0
+
+def forEachPath():
+    if os.path.isdir(FPATH):
+        for file_name in os.listdir(FPATH):
+            formatExcel(file_name)
+    elif os.path.isfile(FPATH):
+        formatExcel(FPATH)
+    else:
+        failList.append(FPATH)
+        print('cfg[excel_path] is error: -- ' + FPATH)
+
+excalEndName = ['.xls','.csv']
+failList = []
+
+if FPATH.find('tables.xls') > 0:
+    dirName = os.path.dirname(FPATH)
+    result,data = TryOpenExl(FPATH)
+    if result > 0:
+        count = data.describe()[0]['count']
+        for i in range(1, count):
+            cfg = data.at[i,0]
+            fp = os.path.join(dirName,cfg)
+            bExists = False
+            for end in excalEndName:
+                if os.path.exists(fp+end):
+                    bExists = True
+                    formatExcel(fp+end)
+                    break
+            if not bExists:
+                failList.append(fp)
 else:
-    print('cfg[excel_path] is error: -- ' + FPATH)
+    forEachPath()
 # import subprocess
 
 # INFO_PATH = '%s/_info.txt' % OPATH
@@ -192,6 +221,6 @@ else:
 #         checkTsLint()
 # except:
 #     pass
-
-print('\n - over - ')
+# print('\n - failList :  %s - ' % failList)
+print('\n - total out put ts:  %s - ' % tsCount)
 os.system('pause')
