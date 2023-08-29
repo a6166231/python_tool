@@ -1,0 +1,11 @@
+{
+    "note1":"ppath为项目路径，会遍历项目下的所有prefab资源",
+    "note2":"out_path为日志输出路径",
+    "note3":"ignorePfb为选择忽略的预制体名对应的节点数组",
+
+    "ppath": "",
+    "out_path": "./log/",
+    "ignorePfb": {
+        "XXX": ["XXX"]
+    }
+}
