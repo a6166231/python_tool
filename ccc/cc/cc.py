@@ -1,4 +1,5 @@
-from typing import TypeVar
+from typing import Any, TypeVar
+from enum import Enum
 
 """
 cocos creator 于py中的解析类
@@ -16,36 +17,118 @@ PFB_UUID = '__uuid__'
 PFB_EXPECTED_TYPE = '__expectedType__'
 
 # 基础对象结构
+# 兼容 obj['key'] / obj.key / obj.get(key) / obj.get('key') 多种用法
+#   - 即  button._transform, label._cacheMode ,  sprite._spriteFrame
 class Object:
     id: int
     """ indexId in self prefab buffer array """
     def __init__(self):
         self.id = -1
+
+    def __getattr__(self, key: str):
+        return self.__getitem__(key)
+
+    def get(self, key: str):
+        return self.__getitem__(key)
+
+    def __getitem__(self, key: str):
+        try:
+            return self.__getattribute__(key)
+        except:
+            return None
+
 # 组件基类 目前基本上prefab中解析的所有的对象都继承于Component类
 class Component(Object):
     node: 'Node'
-    data: dict
     """ default data in prefab buffer array"""
     def __init__(self):
         super().__init__()
         self.node = None
-        self.data = None
+        self.__data = None
+        self.model = Object()
 
-    @staticmethod
-    def TYPE(self):
-        return 'cc.' + self.__name__
+    @property
+    def data(self):
+        return self.__data
+
+    @data.setter
+    def data(self, data):
+        self.model = formatData(data)
+        self.__data = data
+
+    def __getitem__(self, key: str):
+        try:
+            return self.__getattribute__(key)
+        except:
+            return self.model.__getitem__(key)
 
 #目前只把需要的类型解析出来  再细的属性暂时还不需要 可以从父类的data里直接取
 class Button(Component):
+    #按钮的动画类型
+    class TRANSITION(Enum):
+        NONE = 0
+        COLOR = 1
+        SPRITE = 2
+        SCALE = 3
     pass
 class Sprite(Component):
-    pass
+    #Sprite 类型
+    class SpriteType(Enum):
+        # 普通类型。
+        SIMPLE = 0,
+        # 切片（九宫格）类型。
+        SLICED = 1,
+        # @zh  平铺类型
+        TILED =  2,
+        # 填充类型。
+        FILLED = 3,
+        # # 以 Mesh 三角形组成的类型
+        # MESH: 4
+    # 填充类型。
+    class FillType(Enum):
+        # 水平方向填充。
+        HORIZONTAL = 0,
+        # 垂直方向填充。
+        VERTICAL = 1,
+        # 径向填充
+        RADIAL = 2,
+    #精灵尺寸调整模式。
+    class SizeMode(Enum):
+        # 使用节点预设的尺寸。
+        CUSTOM = 0,
+        # 自动适配为精灵裁剪后的尺寸。
+        TRIMMED = 1,
+        # 自动适配为精灵原图尺寸。
+        RAW = 2,
 class Layout(Component):
     pass
 class UITransform(Component):
     pass
 class Label(Component):
-    pass
+    #文本横向对齐类型
+    class HorizontalTextAlignment(Enum):
+        LEFT = 0,
+        CENTER = 1,
+        RIGHT = 2,
+    #文本垂直对齐类型
+    class VerticalTextAlignment(Enum):
+        TOP = 0,
+        CENTER = 1,
+        BOTTOM = 2,
+    #文本溢出行为类型
+    class Overflow(Enum):
+        NONE = 0,
+        #CLAMP 模式中，当文本内容超出边界框时，多余的会被截断
+        CLAMP = 1,
+        #SHRINK 模式，字体大小会动态变化，以适应内容大小。这个模式在文本刷新的时候可能会占用较多 CPU 资源
+        SHRINK = 2,
+        #在 RESIZE_HEIGHT 模式下，只能更改文本的宽度，高度是自动改变的
+        RESIZE_HEIGHT = 3,
+    #文本图集缓存类型
+    class CacheMode(Enum):
+        NONE = 0,
+        BITMAP = 1,
+        CHAR = 2,
 class LabelOutline(Component):
     pass
 class RichText(Component):
@@ -58,7 +141,6 @@ class Node(Component):
 
     components: list['Component']
     children: list['Node']
-
     prefabInfo: 'PrefabInfo'
 
     def __init__(self):
@@ -236,3 +318,12 @@ def getAutoComponentByType(t: str) -> Component:
 #组件类型
 def COM_TYPE(cls: Component) -> str:
     return 'cc.' + cls.__name__
+
+def formatData(data: dict):
+    obj = Object()
+    for key in data:
+        if type(data[key]) == dict:
+            obj.__setattr__(key, formatData(data[key]))
+        else:
+            obj.__setattr__(key, data[key])
+    return obj
