@@ -1,9 +1,17 @@
 from typing import Any, TypeVar
 from enum import Enum
+from .ccutils.dwuuid import *
 
 """
 cocos creator 于py中的解析类
 尽量让用法和cocos中用法相似，尽量保证属性、方法类型规范
+
+example:
+    pfbData = readPrefabDataByPath(pfbPath)
+    pfb = Prefab()
+    pfb.initPfbData(pfbData)
+    vButtons = pfb.getRootNode().getComponentsInChildren(Button)
+    node = pfb.getRootNode().getChildByName('test')
 """
 
 NODE_ID = '__id__'
@@ -47,9 +55,16 @@ class Component(Object):
         self.__data = None
         self.model = Object()
 
+    @staticmethod
+    def TYPE(self):
+        return self.__class__.__name__
+
     @property
-    def data(self):
+    def data(self) -> dict:
         return self.__data
+
+    def Type(self : 'Component'):
+        return self.__class__.__name__
 
     @data.setter
     def data(self, data):
@@ -168,21 +183,28 @@ class Node(Component):
     def getChildren(self):
         return self.children
 
-    def getComponentByType(self, t: type[T]) -> T:
+    def getChildByName(self, name: str) -> 'Node':
+        for child in self.children:
+            if child.name == name:
+                return child
+        return None
+
+    def getComponentByType(self, t: type[T] | str) -> T:
         for com in self.components:
             if type(t) != str and issubclass(com.__class__, t):
                 return com
-            elif com.data != None and t == com.data.get(PFB_TYPE):
+            elif t == com.Type():
                 return com
+        return None
     # 从该节点的所有子节点中查找包含指定组件  
     # bSelf是否包含该节点
-    def getComponentsInChildren(self, t: type[T], bSelf: bool = True) -> list[T]:
+    def getComponentsInChildren(self, t: type[T] | str, bSelf: bool = True) -> list[T]:
         components = []
         if bSelf:
             for com in self.components:
                 if type(t) != str and issubclass(com.__class__, t):
                     components.append(com)
-                elif com.data != None and t == com.data.get(PFB_TYPE):
+                elif t == com.Type():
                     components.append(com)
 
         for child in self.children:
@@ -210,7 +232,7 @@ class PrefabInfo(Component):
     def __formatPrefabInfo(self):
         self.fileId = self.data['fileId']
         asset: dict = self.data['asset']
-        if asset.get(PFB_EXPECTED_TYPE) and asset[PFB_EXPECTED_TYPE] == COM_TYPE(Prefab):
+        if asset.get(PFB_EXPECTED_TYPE) and asset[PFB_EXPECTED_TYPE] == Prefab.TYPE(Prefab):
             self.uuid = asset[PFB_UUID]
 
 #解析prefab预制体文件 同时作为prefab组件用
@@ -232,14 +254,14 @@ class Prefab(Component):
             print('pfb data length is 0!')
             return
         self._buffer = buffer
-        try:
-            pfbData = self._buffer[0]["data"]
-            rootNodeData = self._buffer[pfbData[NODE_ID]]
-            self.root = self.getNodeById(pfbData[NODE_ID])
-            self.__formatNode(rootNodeData, self.root)
-        except:
-            print('init pfb data error!')
-            pass
+        # try:
+        pfbData = self._buffer[0]["data"]
+        rootNodeData = self._buffer[pfbData[NODE_ID]]
+        self.root = self.getNodeById(pfbData[NODE_ID])
+        self.__formatNode(rootNodeData, self.root)
+        # except:
+        #     print('init pfb data error!')
+        #     pass
 
     def getRootNode(self) -> 'Node':
         return self.root
@@ -288,8 +310,38 @@ class Prefab(Component):
             prefab = self.getPrefabInfoById(nodeData[NODE_PREFAB][NODE_ID])
             node.setPrefabInfo(prefab)
 
+    # 当前prefab对象转字符串
     def dumps() -> str:
         return ''
+
+#项目自定义脚本
+class CustomScript(Component):
+    uuid: str
+    compressUUid: str
+
+    def __init__(self):
+        super().__init__()
+        self.uuid = ''
+        self.compressUUid = ''
+
+    # 检测是不是一个项目自定义脚本
+    @staticmethod
+    def check(s: str) :
+        #目前只要解析成功为uuid的都认为是一个自定义的脚本
+        return likeUUid(s)
+
+    @property
+    def data(self) -> dict:
+        return self.__data
+
+    @data.setter
+    def data(self, data):
+        self.model = formatData(data)
+        self.__data = data
+
+        self.compressUUid = self.model[PFB_TYPE]
+        self.uuid = decodeUuid(self.compressUUid)
+
 
 T_OBJ = TypeVar('T_OBJ')
 dictClass = {}
@@ -311,13 +363,17 @@ def getClsSubList(cls: T_OBJ) -> list[T_OBJ]:
 def getAutoComponentByType(t: str) -> Component:
     clsList = getClsSubList(Component)
     for cls in clsList:
-        if COM_TYPE(cls) == t:
+        if COM_TYPE(cls, t):
             return cls()
     return Component()
 
 #组件类型
-def COM_TYPE(cls: Component) -> str:
-    return 'cc.' + cls.__name__
+def COM_TYPE(cls: Component, t: str) -> bool:
+    #检测是可解析的组件还是自定义的脚本
+    if cls == CustomScript:
+        return CustomScript.check(t)
+    else:
+        return ('cc.' + cls.__name__) == t
 
 def formatData(data: dict):
     obj = Object()
