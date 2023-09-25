@@ -16,7 +16,16 @@ cfgJson = json.loads(f.read())
 f.close()
 
 FPATH = cfgJson['excel_path']
+try:
+    if sys.argv[1]:
+        FPATH = sys.argv[1]
+except:
+    pass
+
 OPATH = cfgJson['out_path']
+
+if len(OPATH) == 0:
+    OPATH = './out/'
 
 DESC_INDEX = cfgJson['desc_line']
 TYPE_INDEX = cfgJson['type_line']
