@@ -91,3 +91,11 @@ export interface XXXConfig {
 - 将python脚本通过pyinstaller打包成exe文件，即可无py环境运行
    - 添加右键快捷（管理员运行）.bat 将py2exe加入 *.py 文件的右键列表中，方便在任意文件夹下一键 .py文件转.exe
    - 删除右键快捷（管理员运行）.bat  删除.py文件的py2exe删除掉
+
+## cc ##
+
+- py中解析ccc的预制体文件
+   - 将prefab文件解析成对应的node、compoment的用法
+   - 保证节点/组件的方法、属性用法同ts中写法一致和有代码提示
+   - todo
+      - [ ] prefabInfo解析，对应prefab引用外部prefab的情况
