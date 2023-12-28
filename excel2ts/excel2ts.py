@@ -131,7 +131,12 @@ def formatExcel(file_name:str):
 
     columns = data.columns.tolist()
     #头部注释
-    ts_text = "/**\n * \n * excel : %s\n */\n" % (EXCEL_NAME)
+    #excel名
+    ts_text = "/**\n * \n * excel : %s\n" % (EXCEL_NAME)
+    #excel导出对应的configmanager中的名字
+    ts_text += " public %s: { [key: number]: %s } = {};\n" % (EXCEL_NAME.replace('cfg_',''), CLS_NAME)
+    ts_text += " */\n"
+
     #export interface部分
     ts_text+= 'export interface %s {\n' % CLS_NAME
     for i in columns:
