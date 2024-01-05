@@ -6,8 +6,8 @@
     "note5":"type_line如果没有数据的话，会根据data_line的数据尝试判断一次类型，失败后会默认any类型",
 
 
-    "excel_path": "",
-    "out_path": "",
+    "excel_path": "E:/boxh5/H5Data/tables.xls",
+    "out_path": "./out",
 
     "desc_line": 0,
     "type_line": 2,

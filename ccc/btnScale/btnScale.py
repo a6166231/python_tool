@@ -3,7 +3,8 @@
 import os,json,sys,datetime
 from enum import Enum
 from utils.utils import *
-from cc import *
+
+from cc import cc
 
 if getattr(sys, 'frozen', False):
     absPath = os.path.dirname(os.path.abspath(sys.executable))
@@ -55,9 +56,9 @@ for pfbPath in result:
     cfgJson = json.loads(f.read(),parse_float=formatBigFloat)
     f.close()
 
-    pfb = Prefab()
+    pfb = cc.Prefab()
     pfb.initPfbData(cfgJson)
-    vButtons = pfb.getRootNode().getComponentsInChildren(Button)
+    vButtons = pfb.getRootNode().getComponentsInChildren(cc.Button)
     for i in range(len(vButtons)):
         item = vButtons[i]
         if item.data == None:

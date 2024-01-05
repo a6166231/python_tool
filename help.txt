@@ -1,6 +1,0 @@
-cmd命令行：
-	-updateLight
-	-lock
-	-close
-	-sendemail
-	-enheng

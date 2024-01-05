@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
 import os,json,sys,shutil
-
+absPath=''
 if getattr(sys, 'frozen', False):
     absPath = os.path.dirname(os.path.abspath(sys.executable))
 elif __file__:
@@ -14,7 +14,7 @@ def exit(showPause):
     if showPause:
         os.system('pause')
     os.system('exit')
-
+ppath=''
 try:
     ppath = sys.argv[1]
 except:
@@ -24,8 +24,11 @@ except:
 pdir = os.path.dirname(ppath)
 pname = os.path.basename(ppath).split('.')[0]
 
+_w = input('  p: -w 是否显示窗口参数(y/n)') or 'y'
+_w = ' -w' if _w.lower() == 'y' else ''
+print(_w)
 os.chdir(pdir)
-status = os.system('pyinstaller -F ./%s.py' % pname)
+status = os.system('pyinstaller -F ./%s.py%s' % (pname, _w))
 if status == 0 and os.path.exists('./dist/%s.exe' % pname):
     shutil.copyfile('./dist/%s.exe' % (pname), './%s.exe' % (pname))
     shutil.rmtree('./dist')

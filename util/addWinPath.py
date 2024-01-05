@@ -6,6 +6,7 @@ f.write(wutilPath)
 f.close()
 pypath = os.path.join(os.path.dirname(sys.executable),"lib","site-packages")
 pthpython = pypath + '/myapplication.pth'
+print(pthpython)
 if os.path.exists(pthpython ):
     exit()
 shutil.copyfile(wutilPath + '/myapplication.pth', pthpython)

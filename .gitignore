@@ -7,3 +7,6 @@ util/wpop/conf.json
 installAAB
 system/sendemail.py
 system/sendemail.exe
+excel2ts/out/*.*
+
+**/__pycache__/**/*.*

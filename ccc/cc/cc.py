@@ -1,6 +1,9 @@
+from msilib.schema import SelfReg
+from re import split
 from typing import Any, TypeVar
 from enum import Enum
-from .ccutils.dwuuid import *
+
+from ccc.cc.ccutils.dwuuid import likeUUid,decodeUuid
 
 """
 cocos creator 于py中的解析类
@@ -48,12 +51,16 @@ class Object:
 # 组件基类 目前基本上prefab中解析的所有的对象都继承于Component类
 class Component(Object):
     node: 'Node'
+    uuid: str
+    name: str
     """ default data in prefab buffer array"""
     def __init__(self):
         super().__init__()
         self.node = None
         self.__data = None
         self.model = Object()
+        self.uuid = ''
+        self.name = __name__
 
     @staticmethod
     def TYPE(self):
@@ -119,6 +126,46 @@ class Layout(Component):
     pass
 class UITransform(Component):
     pass
+class BlockInputEvents(Component):
+    pass
+
+class Color(Component):
+    def __init__(self, r=0, g=0, b=0, a=0, HEX=None,DEC=None):
+        super().__init__()
+        if HEX:
+            self.formatHEX(HEX)
+        elif DEC:
+            self.formatDEC(DEC)
+        else :
+            self.r = r
+            self.g = g
+            self.b = b
+            self.a = a
+
+        self.DEC_RGB = '(%s,%s,%s)' % (self.r,self.g,self.b)
+        self.DEC_RGBA = '(%s,%s,%s,%s)' % (self.r,self.g,self.b,self.a)
+
+        self.HEX_REB = '#%s%s%s' % (hex(self.r)[2:],hex(self.g)[2:],hex(self.b)[2:])
+        self.HEX_REBA = '#%s%s%s%s' % (hex(self.r)[2:],hex(self.g)[2:],hex(self.b)[2:],hex(self.a)[2:])
+
+    def formatHEX(self, HEX:str):
+        self.a = int(eval('0x'+HEX[7:])) if len(HEX) > 7 else 0
+        self.b = int(eval('0x'+HEX[5:7]))
+        self.g = int(eval('0x'+HEX[3:5]))
+        self.r = int(eval('0x'+HEX[1:3]))
+
+    def formatDEC(self, DEC:str):
+        decData = split(DEC[2:len(DEC)-1],',')
+        self.a = int(DEC[3])if len(decData) >= 4 else 0
+        self.b = int(DEC[2])
+        self.g = int(DEC[1])
+        self.r = int(DEC[0])
+
+class UIOpacity(Component):
+    def __init__(self):
+        super().__init__()
+        self.opacity = 255
+    pass
 class Label(Component):
     #文本横向对齐类型
     class HorizontalTextAlignment(Enum):
@@ -149,6 +196,19 @@ class LabelOutline(Component):
 class RichText(Component):
     pass
 
+class Vec2(Object):
+    def __init__(self,x:int = 0,y:int = 0):
+        super().__init__()
+        self.x = x
+        self.y = y
+class Rect(Object):
+    def __init__(self,x:int = 0,y:int = 0,widget:int = 100,height:int =100):
+        super().__init__()
+        self.x = x
+        self.y = y
+        self.width = widget
+        self.height = height
+
 T = TypeVar("T")
 class Node(Component):
     name: str
@@ -158,6 +218,9 @@ class Node(Component):
     children: list['Node']
     prefabInfo: 'PrefabInfo'
 
+    position: 'Vec2'
+    scale: 'Vec2'
+
     def __init__(self):
         super().__init__()
         self.name = "node"
@@ -165,6 +228,8 @@ class Node(Component):
         self.components = []
         self.children = []
         self.prefab = None
+        self.position = Vec2()
+        self.scale = Vec2()
 
     def init(self, data, id):
         self.id = id
