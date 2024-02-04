@@ -94,8 +94,17 @@ export interface XXXConfig {
 
 ## cc ##
 
-- py中解析ccc的预制体文件
+- ccprefab dump
+
+   py中解析ccc的预制体文件
+
    - 将prefab文件解析成对应的node、compoment的用法
    - 保证节点/组件的方法、属性用法同ts中写法一致和有代码提示
    - todo
       - [ ] prefabInfo解析，对应prefab引用外部prefab的情况
+
+- cctree
+
+   使用tkGUI库实现的节点树，展示并修改cc节点的属性值，并实时预览
+
+   - [ ] 对接cc节点树数据
