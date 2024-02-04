@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import pandas as pd
-import os,json,sys,shutil
+import os,sys,shutil
 absPath=''
 if getattr(sys, 'frozen', False):
     absPath = os.path.dirname(os.path.abspath(sys.executable))
@@ -24,11 +23,16 @@ except:
 pdir = os.path.dirname(ppath)
 pname = os.path.basename(ppath).split('.')[0]
 
-_w = input('  p: -w 是否显示窗口参数(y/n)') or 'y'
-_w = ' -w' if _w.lower() == 'y' else ''
-print(_w)
+_w = input(' -w : 是否显示窗口参数(y/n):') or 'y'
+_w = ' -w' if _w.lower() == 'n' else ''
 os.chdir(pdir)
-status = os.system('pyinstaller -F ./%s.py%s' % (pname, _w))
+
+try:
+    status = os.system('pyinstaller -F ./%s.py%s' % (pname, _w))
+except Exception as err:
+    print('py2exe err :', err)
+    exit(True)
+
 if status == 0 and os.path.exists('./dist/%s.exe' % pname):
     shutil.copyfile('./dist/%s.exe' % (pname), './%s.exe' % (pname))
     shutil.rmtree('./dist')
