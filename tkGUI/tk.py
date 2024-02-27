@@ -1,10 +1,7 @@
-from queue import Empty
-from tkinter import BaseWidget, BooleanVar, Checkbutton, IntVar, Menu, OptionMenu, StringVar, Tk,Canvas, Variable,Radiobutton,Label,Button,Entry,Frame,Scrollbar, Widget, colorchooser
+from tkinter import BaseWidget, Checkbutton, LabelFrame, OptionMenu, StringVar, Tk,Canvas, Radiobutton,Label,Button,Entry,Frame,colorchooser
 from tkinter.font import Font
 from tkinter.ttk import Treeview
-from typing import Any, Callable
-
-from numpy import rec
+from typing import Callable
 
 from ccc.cc import cc
 
@@ -26,7 +23,7 @@ def createWindow(name:str, width: int = 100, height: int = 100, x: int = 0, y: i
     win.attributes("-alpha", 0.95)
     return win
 
-def createFrame(parent:BaseWidget):
+def createFrame(parent:BaseWidget|Tk):
     w = Frame(parent)
     return w
 
@@ -45,19 +42,24 @@ def createCanvas(parent:BaseWidget | Tk, width:int = 100, height: int = 100):
 def createLb(parent: BaseWidget, string: str = '', size=12):
     lb = Label(parent, text=string,font=Font(size=size))
     return lb
+
+def createLabelFrame(parent: BaseWidget, string: str = '', size=12):
+    lb = LabelFrame(parent, text=string, font=Font(size=size))
+    return lb
+
 def createCheckBtn(parent:BaseWidget, string: str= '', command:Callable|str = ''):
     checkBtn = Checkbutton(parent, text=string, command = command)
     checkBtn.toggle()
     return checkBtn
 
 def createBtn(parent: BaseWidget, string: str = '', command:Callable|str = ''):
-    btn = Button(parent, text=string, command=command)
+    btn = Button(parent, name=string, text=string, command=command)
     return btn
-def createRadioBtn(parent: BaseWidget, string: str = '', command:Callable|str = ''):
-    btn = Radiobutton(parent, text=string, command=command)
+def createRadioBtn(parent: BaseWidget, radio_var, string: str = '', command:Callable|str = ''):
+    btn = Radiobutton(parent, text=string,value=string, variable=radio_var,command=command, )
     return btn
 
-def createEdit(parent: BaseWidget, string: str, updateCall:Callable):
+def createEdit(parent: BaseWidget, string: str, updateCall:Callable | None = None):
     edit = Entry(parent,textvariable=StringVar())
     edit.insert(0,string)
     if updateCall:#更新监听
@@ -102,3 +104,7 @@ def createCCNodeTree(parent: BaseWidget, data:list[cc.Node], height:int=300):
     for node in data:
         insertTreeNode(tree, node)
     return tree
+
+def createFont():
+    font=('italic', 16)
+    return font
