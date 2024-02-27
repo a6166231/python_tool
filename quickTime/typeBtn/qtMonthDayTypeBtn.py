@@ -1,32 +1,43 @@
-from tkinter import BaseWidget, Button
+from tkinter import Entry
 from tkGUI import tk
+from typeBtn.qtTypeBtnBase import QTTypeBtnBase
+import timeQuickJump
 
-class QTMonthDayTypeBtn:
-    @staticmethod
-    def create(parent:BaseWidget):
-        frame = tk.createFrame(parent)
+class QTMonthDayTypeBtn(QTTypeBtnBase):
+    def __init__(self, frame, createCall, pfbData):
+        super().__init__(frame, createCall, pfbData)
+        self.type = timeQuickJump.TimePrefabType.MONTH_DAY.value
 
-        customWidget = QTMonthDayTypeBtn.createCustomWidget(frame)
-        customWidget.grid(row=0,column=0)
+    # 生成自定义的按钮数据
+    def getCustomBtnPrefabData(self):
+        return {
+            'type': self.type,
+            'data': self.monthDay
+        }
 
-        customBtnList = QTMonthDayTypeBtn.createCustomBtnList(frame)
-        customBtnList.grid(row=1,column=0,pady=5)
-
-        return frame
-
-    #自定义的时间点导出按钮
-    @staticmethod
-    def createCustomWidget(parent):
+    def createCustomWidget(self, parent):
         funBtnFrame = tk.createLabelFrame(parent)
-        funBtnFrame.config(width=300,height=50)
+
+        self.monthDay = 1
+
+        def timeTrackUpdate(edit:Entry):
+            try:
+                self.monthDay = int(edit.get())
+            except:
+                self.monthDay = 1
+
+        trackFrame = tk.createFrame(funBtnFrame)
+        trackFrame.pack(fill="both", expand=True)
+
+        edit1 = tk.createEdit(trackFrame, str(self.monthDay), lambda: timeTrackUpdate(edit1))
+        edit1.grid(row=0, column=0, padx=30)
+        edit1.config(width=10)
+        lb = tk.createLb(trackFrame, '号')
+        lb.grid(row=0, column=1, padx=2)
+
+        btnExport = tk.createBtn(trackFrame,'create', lambda: self.createCustomBtnPrefabData())
+        btnExport.grid(row=0, column=2, padx=50, pady=5)
+
+        # trackFrame.config(width=300)
 
         return funBtnFrame
-
-    #自定义的时间点按钮列表
-    @staticmethod
-    def createCustomBtnList(parent):
-        funBtnFrame = tk.createLabelFrame(parent)
-        funBtnFrame.config(width=300,height=300)
-
-        return funBtnFrame
-

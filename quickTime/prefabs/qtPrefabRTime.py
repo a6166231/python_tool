@@ -1,16 +1,17 @@
-from copyreg import constructor
 import datetime
 from prefabs.qtPrefabWidgetBase import QTPrefabWidgetBase
 
 class QTPrefabRTime(QTPrefabWidgetBase):
 
     def __init__(self, parent, data) -> None:
-        vData = data['data'].split('-')
+        super().__init__(parent, data)
+        self.setBtn.pack_forget()
+
+    def formatData(self):
+        vData = self.data['data'].split('-')
         self.day = int(vData[0])
         self.hour = int(vData[1])
         self.minute = int(vData[2])
-        super().__init__(parent, data)
-        self.setBtn.pack_forget()
 
     def getInfoName(self):
         s = ''

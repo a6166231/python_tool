@@ -9,9 +9,9 @@ class TimePrefabType(Enum):
     #相对时间
     RELATIVE_TIME = 2
     #周x
-    WEEK_DAY = 2
+    WEEK_DAY = 3
     #月
-    MONTH_DAY = 3
+    MONTH_DAY = 4
 
 tz = timezone('Asia/Shanghai')
 

@@ -1,16 +1,20 @@
 
-from timeQuickJump import TimeQuickJump, create_date_time, get_now_time
+from timeQuickJump import TimeQuickJump, get_now_time
 from tkGUI import tk
+
 PFB_WIDTH = 280
 
 class QTPrefabWidgetBase:
     def __init__(self, parent, data) -> None:
         self.data = data
+        self.formatData()
         self.frame = self.createFrame(parent)
         self.frame.pack()
         self.editState = False
         self.setEditState(self.editState)
 
+    def formatData(self):
+        pass
     def getNow(self):
         return get_now_time()
 
@@ -38,7 +42,7 @@ class QTPrefabWidgetBase:
     def createFrame(self, parent):
         frame = tk.createFrame(parent)
         lbFrame = tk.createLabelFrame(frame)
-        lbFrame.pack()
+        lbFrame.pack(fill='x')
 
         self.delBtn = tk.createBtn(lbFrame, '[X]')
         self.delBtn.pack(side='left')
@@ -53,7 +57,7 @@ class QTPrefabWidgetBase:
         self.leftBtn = tk.createBtn(lbFrame, '<-', lambda: self.leftTime())
         self.leftBtn.pack(side='left')
 
-        self.setBtn = tk.createBtn(lbFrame, '+', lambda: self.nowTime())
+        self.setBtn = tk.createBtn(lbFrame, '+', lambda: self.triggerTime())
         self.setBtn.pack(side='left')
 
         self.rightBtn = tk.createBtn(lbFrame, '->', lambda: self.rightTime())
@@ -71,7 +75,7 @@ class QTPrefabWidgetBase:
         return
     def rightTime(self):
         return
-    def nowTime(self):
+    def triggerTime(self):
         return
 
     def moveIndex(self):

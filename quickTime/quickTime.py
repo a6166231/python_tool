@@ -2,14 +2,10 @@
 # -*- coding: utf-8 -*-
 
 from operator import indexOf
+from typeBtn.qtTypeBtnFact import createQTTypeBtnByType
 from tkGUI import tk
 import sys,os,json
 import timeQuickJump
-import typeBtn.qtTimeTypeBtn as qtTimeTypeBtn
-import typeBtn.qtMonthDayTypeBtn as qtMonthDayTypeBtn
-import typeBtn.qtRelativeTimeTypeBtn as qtRelativeTimeTypeBtn
-import typeBtn.qtWeekDayTypeBtn as qtWeekDayTypeBtn
-
 
 if getattr(sys, 'frozen', False):
     absPath = os.path.dirname(os.path.abspath(sys.executable))
@@ -18,49 +14,89 @@ elif __file__:
 
 os.chdir(absPath)
 
-
-f = open(os.path.join('./cfg.json'),'r',encoding='utf-8')
-cfgJson = json.loads(f.read())
-f.close()
-
-window = tk.createWindow(name='quickTime',width=530,height=420)
-main = tk.createFrame(window)
-main.pack(expand=True,fill='both')
-topFrame = tk.createFrame(main)
-topFrame.grid(row=0, column=0, padx=10, pady=10,columnspan=2)
-
-# btnTop = tk.createBtn(topFrame, '置顶', command=lambda:windowTopMost(not topMostTag))
-# btnTop.pack(side='right', padx=0)
-
-leftFrame = tk.createFrame(main)
-leftFrame.grid(row=1, column=0, padx=10, pady=10)
-rightFrame = tk.createFrame(main)
-rightFrame.grid(row=1, column=1, padx=10, pady=10)
-
-topMostTag = False
-
-typeBtnsList = {
-    '时间点': qtTimeTypeBtn.QTTimeTypeBtn,
-    '相对时间': qtRelativeTimeTypeBtn.QTRelativeTimeTypeBtn,
-    '星期': qtWeekDayTypeBtn.QTWeekDayTypeBtn,
-    '月': qtMonthDayTypeBtn.QTMonthDayTypeBtn
-}
-dateList = [[{'年':"year"},{'月':'month'},{'日':'day'}],[{'时':'hour'},{'分':'minute'},{'秒':'second'}]]
-
-# def windowTopMost(tag:bool):
-#     global topMostTag
-#     topMostTag = tag
-#     window.attributes("-topmost", 1 if tag else 0)
-#     btnTop.config(foreground='green' if tag else 'black',relief= 'sunken' if tag else 'raised')
+CFG_JSON_PATH = './cfg.json'
 
 def SetJsonData():
-    f = open('./cfg.json','w',encoding='utf-8')
+    f = open(CFG_JSON_PATH,'w',encoding='utf-8')
     f.write(str(json.dumps(cfgJson,indent=4,ensure_ascii=False)))
     f.close()
 
+if os.path.exists(CFG_JSON_PATH):
+    f = open(os.path.join(CFG_JSON_PATH),'r',encoding='utf-8')
+    cfgJson = json.loads(f.read())
+    f.close()
+else :
+    cfgJson = {"data":{}}
+    SetJsonData()
+
+
+window = tk.createWindow(name='quickTime',width=490,height=440)
+main = tk.createFrame(window)
+main.pack(expand=True,fill='both')
+
+leftFrame = tk.createFrame(main)
+leftFrame.pack(side='left', fill='y',padx=10)
+rightFrame = tk.createFrame(main)
+rightFrame.pack(side='left', fill='y')
+
+typeBtnsList = {
+    '时间点': 'QTTimeTypeBtn',
+    '相对时间': 'QTRelativeTimeTypeBtn',
+    '星期': 'QTWeekDayTypeBtn',
+    '月': 'QTMonthDayTypeBtn'
+}
+dateList = [[{'年':"year"},{'月':'month'},{'日':'day'}],[{'时':'hour'},{'分':'minute'},{'秒':'second'}]]
+
+TOOL_NAME = '釫钶钛𬭁'
+
+
+topMostTag = False
+def createGMFrame():
+    gmFrame = tk.createFrame(leftFrame)
+    gmFrame.grid(row = 0, column = 0)
+    gmFrame.config(width=150,height=200)
+
+    def windowTopMost(tag:bool):
+        global topMostTag
+        topMostTag = tag
+        window.attributes("-topmost", 1 if tag else 0)
+        btnTop.config(foreground='green' if tag else 'black',relief= 'sunken' if tag else 'raised')
+
+    def clearCfg():
+        cfgJson["data"] = {}
+        for k in map_qt_frame:
+            map_qt_frame[k].clear()
+        SetJsonData()
+
+    def resetTime():
+        from datetime import datetime
+        import ntplib
+        def get_network_time():
+            NTP_SERVER = "time.windows.com"
+            client = ntplib.NTPClient()
+            response = client.request(NTP_SERVER)
+            network_time = datetime.fromtimestamp(response.tx_time)
+            return network_time
+        _time = get_network_time()
+        timeQuickJump.TimeQuickJump.updateSysTime(timeQuickJump.create_date_time(_time.year, _time.month, _time.day, _time.hour, _time.minute, _time.second))
+
+
+    btnTop = tk.createBtn(gmFrame, '置顶', command=lambda:windowTopMost(not topMostTag))
+    btnTop.place(x=0,y=10)
+    btnTop = tk.createBtn(gmFrame, '重置', command=lambda:resetTime())
+    btnTop.place(x=50,y=10)
+    btnTop = tk.createBtn(gmFrame, '清理', command=lambda:clearCfg())
+    btnTop.place(x=100,y=10)
+
+    toolName = tk.createLb(gmFrame, TOOL_NAME)
+    toolName.place(x=5, y=100)
+
+    toolName.config(font=('kaiti',20,'bold'), fg='#ffa500')
+
 def createTimeFrame():
     timeFrame = tk.createFrame(leftFrame)
-    timeFrame.pack(fill='both')
+    timeFrame.grid(row=1, column=0)
+    timeFrame.config(width=150,height=200)
 
     now = timeQuickJump.get_now_time()
     editMap = {}
@@ -120,7 +156,7 @@ def getTimeJumpPfbData(_type):
         typeData['pfbData'] = pfbData
         SetJsonData()
     return pfbData
-
+map_qt_frame = {}
 def createCustomTimeBtns():
     titleFrame = tk.createFrame(rightFrame)
     titleFrame.grid(row=0, column=0, padx=5, pady=5)
@@ -128,7 +164,6 @@ def createCustomTimeBtns():
     funBtnFrame = tk.createFrame(rightFrame)
     funBtnFrame.grid(row=1, column=0, padx=5, pady=5)
 
-    map_qt_frame = {}
     radio_var = tk.StringVar(value=list(typeBtnsList.keys())[0])
     global last_frame
     last_frame = None
@@ -142,8 +177,9 @@ def createCustomTimeBtns():
         try:
             qt = map_qt_frame[_type]
         except:
-            qt = typeBtnsList[_type].create(funBtnFrame, lambda data: createTimeJumpPfbData(_type, data),getTimeJumpPfbData(_type))
+            qt = createQTTypeBtnByType(typeBtnsList[_type], funBtnFrame, lambda data: createTimeJumpPfbData(_type, data),getTimeJumpPfbData(_type))
             map_qt_frame[_type] = qt
+
         qt.frame.pack()
         last_frame = qt.frame
 
@@ -154,6 +190,7 @@ def createCustomTimeBtns():
         raidBtn.pack(side = 'left', padx=0)
         index+=1
 
+createGMFrame()
 createTimeFrame()
 createCustomTimeBtns()
 

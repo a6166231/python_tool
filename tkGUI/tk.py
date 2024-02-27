@@ -1,4 +1,4 @@
-from tkinter import BaseWidget, Checkbutton, LabelFrame, OptionMenu, StringVar, Tk,Canvas, Radiobutton,Label,Button,Entry,Frame,colorchooser
+from tkinter import HORIZONTAL, VERTICAL, BaseWidget, Checkbutton, LabelFrame, OptionMenu, Scrollbar, StringVar, Tk,Canvas, Radiobutton,Label,Button,Entry,Frame,colorchooser
 from tkinter.font import Font
 from tkinter.ttk import Treeview
 from typing import Callable
@@ -27,11 +27,22 @@ def createFrame(parent:BaseWidget|Tk):
     w = Frame(parent)
     return w
 
+def createViewRect(main:BaseWidget | Tk, width:int, height:int):
+    canvas = createCanvas(main,width,height)
+    canvas.pack(side='left', fill='both', expand=True)
+    frame = createMask(canvas, width,height)
+    frame.pack(fill='both')
+    return frame
+
+def createScrollBar(parent:BaseWidget, bHor:bool = False):
+    bar=Scrollbar(parent,orient=HORIZONTAL if bHor else VERTICAL)
+    return bar
+
 def createMask(canvas: Canvas, width:int = 100, height: int = 100):
     rollFrame=createFrame(canvas)     # 在画布上创建frame
     canvas.create_window((0,0),window=rollFrame,anchor='nw')
     def myfunction(event):
-        canvas.configure(scrollregion=canvas.bbox("all"),width=width,height=height)
+        canvas.configure(scrollregion=canvas.bbox("all"))
     rollFrame.bind("<Configure>",myfunction)
     return rollFrame
 

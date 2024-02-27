@@ -1,6 +1,5 @@
 import datetime
-from tkinter import BaseWidget, Button, Entry
-from typing import Callable
+from tkinter import Button, Entry
 import timeQuickJump
 from tkGUI import tk
 from typeBtn.qtTypeBtnBase import QTTypeBtnBase
@@ -8,53 +7,38 @@ from typeBtn.qtTypeBtnBase import QTTypeBtnBase
 class QTTimeTypeBtn(QTTypeBtnBase):
     def __init__(self, frame, createCall, pfbData) -> None:
         super().__init__(frame, createCall, pfbData)
-        self.dateData = {}
-        self.timeData = {}
         self.type = timeQuickJump.TimePrefabType.TIME_ALL.value
 
     # 生成自定义的按钮数据
-    def createCustomBtnPrefabData(self):
+    def getCustomBtnPrefabData(self):
         sdata = ''
         dateTag = self.dateData['tag']
         timeTag = self.timeData['tag']
         dateData = self.dateData['data']
         timeData = self.timeData['data']
         if dateTag:
-            sdata += '%s-%s-%s' % (dateData[0],dateData[1],dateData[2] ) 
+            sdata += '%s-%s-%s' % (dateData[0],dateData[1],dateData[2])
 
-        if self.type == timeQuickJump.TimePrefabType.TIME_ALL.value:
-            sdata += ' %s:%s:%s' % (timeData[0],timeData[1],timeData[2])
+        if timeTag:
+            if dateTag:
+                sdata += ' '
+            sdata += '%s:%s:%s' % (timeData[0],timeData[1],timeData[2])
 
-        return self.createCall({
+        return {
             'type': self.type,
             'data': sdata
-        })
-
-    @staticmethod
-    def create(parent:BaseWidget, createCall:Callable ,pfbData):
-        frame = tk.createFrame(parent)
-        qt = QTTimeTypeBtn(frame, createCall,pfbData)
-
-        customWidget = QTTimeTypeBtn.createCustomWidget(frame, qt)
-        customWidget.grid(row=0,column=0)
-
-        customBtnList = QTTypeBtnBase.createCustomBtnList(frame, qt)
-        customBtnList.grid(row=1,column=0,pady=5)
-        customBtnList.config(width=300,height=300)
-
-        return qt
+        }
 
     #自定义的时间点导出按钮
-    @staticmethod
-    def createCustomWidget(parent, qt):
+    def createCustomWidget(self, parent):
         funBtnFrame = tk.createLabelFrame(parent)
         _time = datetime.datetime.now()
 
         btnData1 = { "tag": False , "data": [_time.year, _time.month, _time.day]}
         btnData2 = { "tag": False , "data": [_time.hour, _time.minute, _time.second]}
 
-        qt.dateData = btnData1
-        qt.timeData = btnData2
+        self.dateData = btnData1
+        self.timeData = btnData2
 
         def stautsBtnCheck(btn: Button, data):
             data['tag'] = not data['tag']
@@ -62,7 +46,11 @@ class QTTimeTypeBtn(QTTypeBtnBase):
             btn.config(foreground='green' if tag else 'black', relief= 'sunken' if tag else 'raised')
 
         def timeTrackUpdate(edit:Entry, data, index):
-            data[index] = int(edit.get())
+            # data[index] = int(edit.get())
+            try:
+                data[index] = int(edit.get())
+            except:
+                data[index] = 0
 
         def createTimeTrackFrame(frameparent, data, gap):
             trackFrame = tk.createFrame(frameparent)
@@ -100,7 +88,7 @@ class QTTimeTypeBtn(QTTypeBtnBase):
         timetrack1.grid(row=0, column=1, padx=12, pady=5)
         timetrack2.grid(row=1, column=1, padx=12, pady=5)
 
-        btnExport = tk.createBtn(funBtnFrame,'create', lambda: qt.createCustomBtnPrefabData())
+        btnExport = tk.createBtn(funBtnFrame,'create', lambda: self.createCustomBtnPrefabData())
         btnExport.grid(row=0, column=3, padx=12, pady=5, rowspan=2)
 
         funBtnFrame.config(width=300,height=50)
