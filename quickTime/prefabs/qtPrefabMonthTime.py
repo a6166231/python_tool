@@ -5,7 +5,6 @@ class QTPrefabMonthTime(QTPrefabWidgetBase):
 
     def __init__(self, parent, data) -> None:
         super().__init__(parent, data)
-        self.setBtn.pack_forget()
 
     def formatData(self):
         self.monthDay = int(self.data['data'])
@@ -43,4 +42,13 @@ class QTPrefabMonthTime(QTPrefabWidgetBase):
                 dayCeil = monthday - now.day + self.monthDay
 
         now = now + datetime.timedelta(days=dayCeil)
+        self.setTime(now)
+
+    def triggerTime(self):
+        now = self.getNow()
+
+        if self.monthDay == now.day:
+            return
+
+        now = now + datetime.timedelta(days=self.monthDay - now.day)
         self.setTime(now)

@@ -4,7 +4,6 @@ from prefabs.qtPrefabWidgetBase import QTPrefabWidgetBase
 class QTPrefabWeekTime(QTPrefabWidgetBase):
     def __init__(self, parent, data) -> None:
         super().__init__(parent, data)
-        self.setBtn.pack_forget()
 
     def formatData(self):
         self.weekDay = int(self.data['data'])
@@ -34,4 +33,14 @@ class QTPrefabWeekTime(QTPrefabWidgetBase):
             dayCeil = 7 - week + self.weekDay
         now = now + datetime.timedelta(days=dayCeil)
 
+        self.setTime(now)
+
+    def triggerTime(self):
+        now = self.getNow()
+        week = now.isoweekday()
+
+        if self.weekDay == week:
+            return
+
+        now = now + datetime.timedelta(days=self.weekDay - week)
         self.setTime(now)

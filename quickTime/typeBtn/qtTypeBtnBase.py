@@ -3,13 +3,14 @@
 from tkinter import BaseWidget
 from typing import Any, Callable
 from prefabs.qtPrefabFact import createQTPrefabByType
-
+import timeQuickJump
 from tkGUI import tk
 
 QT_TYPE_TRACK_WIDTH = 300
 QT_TYPE_TRACK_HEIGHT = 300
 
 class QTTypeBtnBase:
+    type:int
     def __init__(self , parent: BaseWidget, createCall:Callable, pfbData) -> None:
         self.createCall = createCall
         self.parent = parent
@@ -49,7 +50,7 @@ class QTTypeBtnBase:
 
     #自定义的时间点按钮列表
     def createCustomBtnItem(self, parent, pfb):
-        _item = createQTPrefabByType(pfb['type'] , parent, pfb)
+        _item = createQTPrefabByType(self.type , parent, pfb)
         return _item
 
     def getCustomBtnPrefabData(self)->Any:
@@ -60,7 +61,7 @@ class QTTypeBtnBase:
         pfbData = self.getCustomBtnPrefabData()
         print(pfbData)
         try:
-            if pfbData and pfbData['type'] and pfbData['data']:
+            if pfbData and pfbData['data']:
                 self.createCall(pfbData)
                 self.createCustomBtnItem(self.customBtnList, pfbData)
                 return

@@ -29,8 +29,26 @@ else :
     cfgJson = {"data":{}}
     SetJsonData()
 
+def resetTime():
+    from datetime import datetime
+    import ntplib
+    def get_network_time():
+        NTP_SERVER = "time.windows.com"
+        client = ntplib.NTPClient()
+        response = client.request(NTP_SERVER)
+        network_time = datetime.fromtimestamp(response.tx_time)
+        return network_time
+    _time = get_network_time()
+    timeQuickJump.TimeQuickJump.updateSysTime(timeQuickJump.create_date_time(_time.year, _time.month, _time.day, _time.hour, _time.minute, _time.second))
+
+def onClose():
+    resetTime()
+    window.quit()
 
 window = tk.createWindow(name='quickTime',width=490,height=440)
+window.protocol("WM_DELETE_WINDOW", lambda:onClose())
+window.resizable(False, False)
+
 main = tk.createFrame(window)
 main.pack(expand=True,fill='both')
 
@@ -68,25 +86,12 @@ def createGMFrame():
             map_qt_frame[k].clear()
         SetJsonData()
 
-    def resetTime():
-        from datetime import datetime
-        import ntplib
-        def get_network_time():
-            NTP_SERVER = "time.windows.com"
-            client = ntplib.NTPClient()
-            response = client.request(NTP_SERVER)
-            network_time = datetime.fromtimestamp(response.tx_time)
-            return network_time
-        _time = get_network_time()
-        timeQuickJump.TimeQuickJump.updateSysTime(timeQuickJump.create_date_time(_time.year, _time.month, _time.day, _time.hour, _time.minute, _time.second))
-
-
     btnTop = tk.createBtn(gmFrame, '置顶', command=lambda:windowTopMost(not topMostTag))
     btnTop.place(x=0,y=10)
-    btnTop = tk.createBtn(gmFrame, '重置', command=lambda:resetTime())
-    btnTop.place(x=50,y=10)
-    btnTop = tk.createBtn(gmFrame, '清理', command=lambda:clearCfg())
-    btnTop.place(x=100,y=10)
+    btnReset = tk.createBtn(gmFrame, '重置', command=lambda:resetTime())
+    btnReset.place(x=50,y=10)
+    btnClear = tk.createBtn(gmFrame, '清理', command=lambda:clearCfg())
+    btnClear.place(x=100,y=10)
 
     toolName = tk.createLb(gmFrame, TOOL_NAME)
     toolName.place(x=5, y=100)

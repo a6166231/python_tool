@@ -5,13 +5,13 @@ from typeBtn.qtTypeBtnBase import QTTypeBtnBase
 
 class QTWeekDayTypeBtn(QTTypeBtnBase):
     def __init__(self, frame, createCall, pfbData):
-        super().__init__(frame, createCall, pfbData)
         self.type = timeQuickJump.TimePrefabType.WEEK_DAY.value
+        super().__init__(frame, createCall, pfbData)
 
     # 生成自定义的按钮数据
     def getCustomBtnPrefabData(self):
         return {
-            'type': self.type,
+            # 'type': self.type,
             'data': self.weekDay
         }
 

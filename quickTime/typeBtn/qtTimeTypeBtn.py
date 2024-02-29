@@ -6,8 +6,8 @@ from typeBtn.qtTypeBtnBase import QTTypeBtnBase
 
 class QTTimeTypeBtn(QTTypeBtnBase):
     def __init__(self, frame, createCall, pfbData) -> None:
-        super().__init__(frame, createCall, pfbData)
         self.type = timeQuickJump.TimePrefabType.TIME_ALL.value
+        super().__init__(frame, createCall, pfbData)
 
     # 生成自定义的按钮数据
     def getCustomBtnPrefabData(self):
@@ -25,7 +25,7 @@ class QTTimeTypeBtn(QTTypeBtnBase):
             sdata += '%s:%s:%s' % (timeData[0],timeData[1],timeData[2])
 
         return {
-            'type': self.type,
+            # 'type': self.type,
             'data': sdata
         }
 

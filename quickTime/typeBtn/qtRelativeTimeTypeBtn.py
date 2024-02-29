@@ -5,8 +5,9 @@ from tkGUI import tk
 
 class QTRelativeTimeTypeBtn(QTTypeBtnBase):
     def __init__(self, frame, createCall, pfbData):
-        super().__init__(frame, createCall, pfbData)
         self.type = timeQuickJump.TimePrefabType.RELATIVE_TIME.value
+        super().__init__(frame, createCall, pfbData)
+
 
     # 生成自定义的按钮数据
     def getCustomBtnPrefabData(self):
@@ -20,7 +21,7 @@ class QTRelativeTimeTypeBtn(QTTypeBtnBase):
 
         sdata = '%s-%s-%s' % (dayData if dayTag else 0, hourData if hourTag else 0, minuteData if minuteTag else 0)
         return {
-            'type': self.type,
+            # 'type': self.type,
             'data': sdata
         }
 
