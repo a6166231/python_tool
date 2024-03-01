@@ -3,6 +3,8 @@ from re import split
 from typing import Any, TypeVar
 from enum import Enum
 
+from numpy import number
+
 from ccc.cc.ccutils.dwuuid import likeUUid,decodeUuid
 
 """
@@ -122,10 +124,19 @@ class Sprite(Component):
         TRIMMED = 1,
         # 自动适配为精灵原图尺寸。
         RAW = 2,
+
+    def __init__(self, spriteframe: str = ''):
+        super().__init__()
+        self.spriteframe = spriteframe
+
 class Layout(Component):
     pass
 class UITransform(Component):
-    pass
+    def __init__(self, width = 100, height = 100):
+        super().__init__()
+        self.width = width
+        self.height = height
+
 class BlockInputEvents(Component):
     pass
 
@@ -162,9 +173,9 @@ class Color(Component):
         self.r = int(DEC[0])
 
 class UIOpacity(Component):
-    def __init__(self):
+    def __init__(self, opacity:int = 255):
         super().__init__()
-        self.opacity = 255
+        self.opacity = opacity
     pass
 class Label(Component):
     #文本横向对齐类型
@@ -191,6 +202,12 @@ class Label(Component):
         NONE = 0,
         BITMAP = 1,
         CHAR = 2,
+    def __init__(self):
+        super().__init__()
+        self.string = ''
+        self.fontSize = 24
+        self.lineHeight = 24
+
 class LabelOutline(Component):
     pass
 class RichText(Component):
