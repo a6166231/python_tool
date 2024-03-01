@@ -5,13 +5,13 @@ from typeBtn.qtTimeTypeBtn import QTTimeTypeBtn
 from typeBtn.qtWeekDayTypeBtn import QTWeekDayTypeBtn
 from typeBtn.qtTypeBtnBase import QTTypeBtnBase
 
-def createQTTypeBtnByType(_type, parent, call,  data):
+def createQTTypeBtnByType(_type, parent, editState):
     if (_type == QTRelativeTimeTypeBtn.__name__):
-        return QTRelativeTimeTypeBtn(parent, call,  data)
+        return QTRelativeTimeTypeBtn(parent, editState)
     elif (_type == QTTimeTypeBtn.__name__):
-        return QTTimeTypeBtn(parent, call,  data)
+        return QTTimeTypeBtn(parent, editState)
     elif (_type == QTWeekDayTypeBtn.__name__):
-        return QTWeekDayTypeBtn(parent, call,  data)
+        return QTWeekDayTypeBtn(parent, editState)
     elif (_type == QTMonthDayTypeBtn.__name__):
-        return QTMonthDayTypeBtn(parent, call,  data)
-    return QTTypeBtnBase(parent, call,  data)
+        return QTMonthDayTypeBtn(parent, editState)
+    return QTTypeBtnBase(parent, editState)

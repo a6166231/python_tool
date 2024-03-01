@@ -5,9 +5,9 @@ from tkGUI import tk
 from typeBtn.qtTypeBtnBase import QTTypeBtnBase
 
 class QTTimeTypeBtn(QTTypeBtnBase):
-    def __init__(self, frame, createCall, pfbData) -> None:
+    def __init__(self, frame, editStatus) -> None:
         self.type = timeQuickJump.TimePrefabType.TIME_ALL.value
-        super().__init__(frame, createCall, pfbData)
+        super().__init__(frame, editStatus)
 
     # 生成自定义的按钮数据
     def getCustomBtnPrefabData(self):
@@ -43,7 +43,7 @@ class QTTimeTypeBtn(QTTypeBtnBase):
         def stautsBtnCheck(btn: Button, data):
             data['tag'] = not data['tag']
             tag = data['tag']
-            btn.config(foreground='green' if tag else 'black', relief= 'sunken' if tag else 'raised')
+            tk.setBtnStyleStatus(btn, tag)
 
         def timeTrackUpdate(edit:Entry, data, index):
             # data[index] = int(edit.get())

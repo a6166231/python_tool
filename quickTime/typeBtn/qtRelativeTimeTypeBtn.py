@@ -4,20 +4,25 @@ import timeQuickJump
 from tkGUI import tk
 
 class QTRelativeTimeTypeBtn(QTTypeBtnBase):
-    def __init__(self, frame, createCall, pfbData):
+    def __init__(self, frame, editStatus):
         self.type = timeQuickJump.TimePrefabType.RELATIVE_TIME.value
-        super().__init__(frame, createCall, pfbData)
-
+        super().__init__(frame, editStatus)
 
     # 生成自定义的按钮数据
     def getCustomBtnPrefabData(self):
         dayTag = self.day['tag']
         hourTag = self.hour['tag']
         minuteTag = self.minute['tag']
+        if not dayTag and not hourTag and not minuteTag:
+            return None
 
         dayData = self.day['data']
         hourData = self.hour['data']
         minuteData = self.minute['data']
+
+        if dayData == 0 and hourData == 0 and minuteData == 0:
+            print('?')
+            return None
 
         sdata = '%s-%s-%s' % (dayData if dayTag else 0, hourData if hourTag else 0, minuteData if minuteTag else 0)
         return {
@@ -39,7 +44,7 @@ class QTRelativeTimeTypeBtn(QTTypeBtnBase):
         def stautsBtnCheck(btn: Button, data):
             data['tag'] = not data['tag']
             tag = data['tag']
-            btn.config(foreground='green' if tag else 'black', relief= 'sunken' if tag else 'raised')
+            tk.setBtnStyleStatus(btn, tag)
 
         def timeTrackUpdate(edit:Entry, data):
             # data["data"] = int(edit.get())

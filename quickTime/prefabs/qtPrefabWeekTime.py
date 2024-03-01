@@ -2,9 +2,6 @@ import datetime
 from prefabs.qtPrefabWidgetBase import QTPrefabWidgetBase
 
 class QTPrefabWeekTime(QTPrefabWidgetBase):
-    def __init__(self, parent, data) -> None:
-        super().__init__(parent, data)
-
     def formatData(self):
         self.weekDay = int(self.data['data'])
 

@@ -2,10 +2,8 @@ from prefabs.qtPrefabWidgetBase import QTPrefabWidgetBase
 from timeQuickJump import create_date_time
 
 class QTPrefabATime(QTPrefabWidgetBase):
-    def __init__(self, parent, data) -> None:
-        super().__init__(parent, data)
-        self.leftBtn.pack_forget()
-        self.rightBtn.pack_forget()
+    def getVisibleBtnList(self):
+        return [self.setBtn]
 
     def formatData(self):
         vData = self.data['data'].split(' ')

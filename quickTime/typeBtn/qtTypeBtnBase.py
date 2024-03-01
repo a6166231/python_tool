@@ -1,9 +1,9 @@
 
 
-from tkinter import BaseWidget
-from typing import Any, Callable
+from tkinter import BaseWidget, Frame, Widget
+from typing import Any
 from prefabs.qtPrefabFact import createQTPrefabByType
-import timeQuickJump
+from quickData import createTimeJumpPfbData, delTimeJumpPfbData, getTimeJumpPfbData, setTimeJumpPfbDatIndex
 from tkGUI import tk
 
 QT_TYPE_TRACK_WIDTH = 300
@@ -11,10 +11,11 @@ QT_TYPE_TRACK_HEIGHT = 300
 
 class QTTypeBtnBase:
     type:int
-    def __init__(self , parent: BaseWidget, createCall:Callable, pfbData) -> None:
-        self.createCall = createCall
+    def __init__(self , parent: BaseWidget, editState) -> None:
         self.parent = parent
-        self.pfbData = pfbData
+        self.pfbData = getTimeJumpPfbData(self.type)
+        self.vPrefabList = []
+        self.editState = editState
         self.create()
 
     def create(self):
@@ -28,10 +29,32 @@ class QTTypeBtnBase:
         self.frame.config(width=QT_TYPE_TRACK_WIDTH, height=500)
         self.frame.pack_propagate(False)
 
+    def delItem(self, qtBtn):
+        self.vPrefabList.remove(qtBtn)
+        delTimeJumpPfbData(self.type, qtBtn.data)
+        self.sortAllPfbGrid()
+
+    def moveItem(self, qtBtn):
+        try:
+            _index = self.vPrefabList.index(qtBtn)
+            if _index != 0:
+                self.vPrefabList.remove(qtBtn)
+                self.vPrefabList.insert(_index-1, qtBtn)
+                self.sortAllPfbGrid()
+            setTimeJumpPfbDatIndex(self.type, qtBtn.data)
+        except:
+            pass
+
     def clear(self):
         for child in self.customBtnList.winfo_children():
             child.destroy()
+        self.vPrefabList = []
 
+    def sortAllPfbGrid(self):
+        for i in range(len(self.vPrefabList)):
+            btn = self.vPrefabList[i]
+            btn.frame.grid(row = i)
+    
     def createCustomWidget(self, parent):
         funBtnFrame = tk.createLabelFrame(parent)
         return funBtnFrame
@@ -40,9 +63,7 @@ class QTTypeBtnBase:
     def createCustomBtnList(self, parent):
         rect = tk.createLabelFrame(parent)
         rect.config(width=QT_TYPE_TRACK_WIDTH, height=QT_TYPE_TRACK_WIDTH)
-        # rect.pack_propagate(False)
-        # funBtnFrame = tk.createViewRect(rect, QT_TYPE_TRACK_WIDTH, QT_TYPE_TRACK_HEIGHT)
-        # funBtnFrame.pack()
+
         for pfb in self.pfbData:
             btn = self.createCustomBtnItem(rect, pfb)
             btn.frame.config(width=QT_TYPE_TRACK_WIDTH-10)
@@ -50,8 +71,19 @@ class QTTypeBtnBase:
 
     #自定义的时间点按钮列表
     def createCustomBtnItem(self, parent, pfb):
-        _item = createQTPrefabByType(self.type , parent, pfb)
+        _item = createQTPrefabByType(self , parent, pfb)
+        _item.frame.grid(row=len(self.vPrefabList))
+
+        parent.grid_rowconfigure(len(self.vPrefabList),weight=1)
+        parent.grid_columnconfigure(0,weight=1)
+
+        self.vPrefabList.append(_item)
         return _item
+
+    def setEditState(self, status:bool):
+        self.editState = status
+        for qt in self.vPrefabList:
+            qt.setEditState(status)
 
     def getCustomBtnPrefabData(self)->Any:
         return
@@ -59,10 +91,9 @@ class QTTypeBtnBase:
     # 生成自定义的按钮数据
     def createCustomBtnPrefabData(self):
         pfbData = self.getCustomBtnPrefabData()
-        print(pfbData)
         try:
             if pfbData and pfbData['data']:
-                self.createCall(pfbData)
+                createTimeJumpPfbData(self.type, pfbData)
                 self.createCustomBtnItem(self.customBtnList, pfbData)
                 return
         except:

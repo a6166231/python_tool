@@ -4,12 +4,15 @@ from tkGUI import tk
 from typeBtn.qtTypeBtnBase import QTTypeBtnBase
 
 class QTWeekDayTypeBtn(QTTypeBtnBase):
-    def __init__(self, frame, createCall, pfbData):
+    def __init__(self, frame, editStatus):
         self.type = timeQuickJump.TimePrefabType.WEEK_DAY.value
-        super().__init__(frame, createCall, pfbData)
+        super().__init__(frame, editStatus)
 
     # 生成自定义的按钮数据
     def getCustomBtnPrefabData(self):
+        if self.weekDay <= 0 or self.weekDay > 7:
+            print("?")
+            return None
         return {
             # 'type': self.type,
             'data': self.weekDay

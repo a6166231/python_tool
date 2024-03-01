@@ -1,4 +1,4 @@
-from tkinter import HORIZONTAL, VERTICAL, BaseWidget, Checkbutton, LabelFrame, OptionMenu, Scrollbar, StringVar, Tk,Canvas, Radiobutton,Label,Button,Entry,Frame,colorchooser
+from tkinter import HORIZONTAL, VERTICAL, BaseWidget, Checkbutton, LabelFrame, OptionMenu, PhotoImage, Scrollbar, StringVar, Tk,Canvas, Radiobutton,Label,Button,Entry,Frame,colorchooser
 from tkinter.font import Font
 from tkinter.ttk import Treeview
 from typing import Callable
@@ -119,3 +119,10 @@ def createCCNodeTree(parent: BaseWidget, data:list[cc.Node], height:int=300):
 def createFont():
     font=('italic', 16)
     return font
+
+def createPhotoImage(s):
+    img = PhotoImage(data=s)
+    return img
+
+def setBtnStyleStatus(btn:Button, status:bool):
+    btn.config(foreground='green' if status else 'black',relief= 'sunken' if status else 'raised')

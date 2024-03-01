@@ -4,12 +4,15 @@ from typeBtn.qtTypeBtnBase import QTTypeBtnBase
 import timeQuickJump
 
 class QTMonthDayTypeBtn(QTTypeBtnBase):
-    def __init__(self, frame, createCall, pfbData):
+    def __init__(self, frame, editStatus):
         self.type = timeQuickJump.TimePrefabType.MONTH_DAY.value
-        super().__init__(frame, createCall, pfbData)
+        super().__init__(frame, editStatus)
 
     # 生成自定义的按钮数据
     def getCustomBtnPrefabData(self):
+        if self.monthDay <= 0 or self.monthDay > 31:
+            print("?")
+            return None
         return {
             # 'type': self.type,
             'data': self.monthDay

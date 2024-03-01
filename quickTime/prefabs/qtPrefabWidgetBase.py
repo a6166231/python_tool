@@ -1,20 +1,27 @@
 
+from quickData import setTimeJumpPfbDatIndex
 from timeQuickJump import TimeQuickJump, get_now_time
 from tkGUI import tk
 
 PFB_WIDTH = 280
 
 class QTPrefabWidgetBase:
-    def __init__(self, parent, data) -> None:
+    editState:bool = False
+    def __init__(self, parent, data ,qtType) -> None:
         self.data = data
         self.formatData()
         self.frame = self.createFrame(parent)
-        self.frame.pack()
-        self.editState = False
+        self.editState = qtType.editState
+        self.qtType = qtType
         self.setEditState(self.editState)
 
+    def getAllBtnList(self):
+        return [self.leftBtn, self.setBtn, self.rightBtn]
+    def getVisibleBtnList(self):
+        return self.getAllBtnList()
     def formatData(self):
         pass
+
     def getNow(self):
         return get_now_time()
 
@@ -24,50 +31,61 @@ class QTPrefabWidgetBase:
     def setEditState(self, state:bool):
         self.editState = state
 
+        vbtnList = self.getVisibleBtnList()
+        vAllList = self.getAllBtnList()
+
         if not state:
-            self.upBtn.pack_forget()
-            self.delBtn.pack_forget()
-
-            self.leftBtn.pack()
-            self.setBtn.pack()
-            self.rightBtn.pack()
+            self.delBtn.grid_forget()
+            self.upBtn.grid_forget()
+            index = 2
+            for btn in vAllList:
+                if btn in vbtnList:
+                    btn.grid(row=0, column=index)
+                else :
+                    btn.grid_forget()
+                index+=1
         else:
-            self.upBtn.pack()
-            self.delBtn.pack()
-
-            self.leftBtn.pack_forget()
-            self.setBtn.pack_forget()
-            self.rightBtn.pack_forget()
+            self.delBtn.grid(row=0, column=0)
+            for btn in vbtnList:
+                btn.grid_forget()
+            self.upBtn.grid(row=0, column=5)
 
     def createFrame(self, parent):
-        frame = tk.createFrame(parent)
-        lbFrame = tk.createLabelFrame(frame)
-        lbFrame.pack(fill='x')
+        lbFrame = tk.createLabelFrame(parent)
+        lbFrame.grid(row=0,column=0,sticky='nsew')
 
-        self.delBtn = tk.createBtn(lbFrame, '[X]')
-        self.delBtn.pack(side='left')
+        lbFrame.grid_rowconfigure(0,weight=1)
+        lbFrame.grid_columnconfigure(1,weight=1)
+
+        self.delBtn = tk.createBtn(lbFrame, '[ X ]', lambda: self.delItem())
+        self.delBtn.grid(row=0, column=0)
+        self.delBtn.config(fg='red')
 
         lbInfopar = tk.createFrame(lbFrame)
-        self.lbInfo = tk.createLb(lbInfopar, self.getInfoName())
-        self.lbInfo.pack()
-        self.lbInfo.config(width=27, anchor='w')
 
-        lbInfopar.pack(side='left',fill='x',expand=True)
+        lbInfopar.grid_rowconfigure(0,weight=1)
+        lbInfopar.grid_columnconfigure(0,weight=1)
+
+        self.lbInfo = tk.createLb(lbInfopar, self.getInfoName())
+        self.lbInfo.grid(row=0,column=0,sticky='w')
+        self.lbInfo.config(anchor='w')
+
+        lbInfopar.grid(row=0,column=1,sticky='nsew')
 
         self.leftBtn = tk.createBtn(lbFrame, '<-', lambda: self.leftTime())
-        self.leftBtn.pack(side='left')
+        self.leftBtn.grid(row=0, column=2)
 
-        self.setBtn = tk.createBtn(lbFrame, '+', lambda: self.triggerTime())
-        self.setBtn.pack(side='left')
+        self.setBtn = tk.createBtn(lbFrame, ' + ', lambda: self.triggerTime())
+        self.setBtn.grid(row=0, column=3)
 
         self.rightBtn = tk.createBtn(lbFrame, '->', lambda: self.rightTime())
-        self.rightBtn.pack(side='left')
+        self.rightBtn.grid(row=0, column=4)
 
-        self.upBtn = tk.createBtn(lbFrame, '^', lambda: self.moveIndex())
-        self.upBtn.pack(side='left')
+        self.upBtn = tk.createBtn(lbFrame, ' ^ ', lambda: self.moveItem())
+        self.upBtn.grid(row=0, column=5)
 
         lbFrame.config(width=PFB_WIDTH)
-        return frame
+        return lbFrame
 
     def getInfoName(self):
         return self.data["data"]
@@ -78,5 +96,9 @@ class QTPrefabWidgetBase:
     def triggerTime(self):
         return
 
-    def moveIndex(self):
-        pass
+    def moveItem(self):
+        self.qtType.moveItem(self)
+
+    def delItem(self):
+        self.qtType.delItem(self)
+        self.frame.destroy()

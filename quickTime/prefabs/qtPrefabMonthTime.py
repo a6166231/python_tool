@@ -2,10 +2,6 @@ import datetime,calendar
 from prefabs.qtPrefabWidgetBase import QTPrefabWidgetBase
 
 class QTPrefabMonthTime(QTPrefabWidgetBase):
-
-    def __init__(self, parent, data) -> None:
-        super().__init__(parent, data)
-
     def formatData(self):
         self.monthDay = int(self.data['data'])
 

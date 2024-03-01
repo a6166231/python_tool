@@ -2,10 +2,8 @@ import datetime
 from prefabs.qtPrefabWidgetBase import QTPrefabWidgetBase
 
 class QTPrefabRTime(QTPrefabWidgetBase):
-
-    def __init__(self, parent, data) -> None:
-        super().__init__(parent, data)
-        self.setBtn.pack_forget()
+    def getVisibleBtnList(self):
+        return [self.leftBtn, self.rightBtn]
 
     def formatData(self):
         vData = self.data['data'].split('-')
