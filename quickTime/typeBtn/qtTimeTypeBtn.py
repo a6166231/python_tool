@@ -5,6 +5,7 @@ from tkGUI import tk
 from typeBtn.qtTypeBtnBase import QTTypeBtnBase
 
 class QTTimeTypeBtn(QTTypeBtnBase):
+    height: int = 260
     def __init__(self, frame, editStatus) -> None:
         self.type = timeQuickJump.TimePrefabType.TIME_ALL.value
         super().__init__(frame, editStatus)

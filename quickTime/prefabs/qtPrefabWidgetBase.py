@@ -1,5 +1,4 @@
 
-from quickData import setTimeJumpPfbDatIndex
 from timeQuickJump import TimeQuickJump, get_now_time
 from tkGUI import tk
 
@@ -52,16 +51,22 @@ class QTPrefabWidgetBase:
 
     def createFrame(self, parent):
         lbFrame = tk.createLabelFrame(parent)
-        lbFrame.grid(row=0,column=0,sticky='nsew')
+        # lbFrame.grid(row=0, column=0, sticky='nsew')
+        lbFrame.config(width=PFB_WIDTH,height=35)
+        lbFrame.pack_propagate(False)
 
-        lbFrame.grid_rowconfigure(0,weight=1)
-        lbFrame.grid_columnconfigure(1,weight=1)
+        content = tk.createFrame(lbFrame)
+        content.pack(fill='both')
+        content.pack_propagate(False)
 
-        self.delBtn = tk.createBtn(lbFrame, '[ X ]', lambda: self.delItem())
+        content.grid_rowconfigure(0,weight=1)
+        content.grid_columnconfigure(1,weight=1)
+
+        self.delBtn = tk.createBtn(content, '[ X ]', lambda: self.delItem())
         self.delBtn.grid(row=0, column=0)
         self.delBtn.config(fg='red')
 
-        lbInfopar = tk.createFrame(lbFrame)
+        lbInfopar = tk.createFrame(content)
 
         lbInfopar.grid_rowconfigure(0,weight=1)
         lbInfopar.grid_columnconfigure(0,weight=1)
@@ -72,19 +77,18 @@ class QTPrefabWidgetBase:
 
         lbInfopar.grid(row=0,column=1,sticky='nsew')
 
-        self.leftBtn = tk.createBtn(lbFrame, '<-', lambda: self.leftTime())
+        self.leftBtn = tk.createBtn(content, '<-', lambda: self.leftTime())
         self.leftBtn.grid(row=0, column=2)
 
-        self.setBtn = tk.createBtn(lbFrame, ' + ', lambda: self.triggerTime())
+        self.setBtn = tk.createBtn(content, ' + ', lambda: self.triggerTime())
         self.setBtn.grid(row=0, column=3)
 
-        self.rightBtn = tk.createBtn(lbFrame, '->', lambda: self.rightTime())
+        self.rightBtn = tk.createBtn(content, '->', lambda: self.rightTime())
         self.rightBtn.grid(row=0, column=4)
 
-        self.upBtn = tk.createBtn(lbFrame, ' ^ ', lambda: self.moveItem())
+        self.upBtn = tk.createBtn(content, ' ^ ', lambda: self.moveItem())
         self.upBtn.grid(row=0, column=5)
 
-        lbFrame.config(width=PFB_WIDTH)
         return lbFrame
 
     def getInfoName(self):

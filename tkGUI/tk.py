@@ -27,24 +27,27 @@ def createFrame(parent:BaseWidget|Tk):
     w = Frame(parent)
     return w
 
-def createViewRect(main:BaseWidget | Tk, width:int, height:int):
-    canvas = createCanvas(main,width,height)
-    canvas.pack(side='left', fill='both', expand=True)
-    frame = createMask(canvas, width,height)
-    frame.pack(fill='both')
-    return frame
-
-def createScrollBar(parent:BaseWidget, bHor:bool = False):
-    bar=Scrollbar(parent,orient=HORIZONTAL if bHor else VERTICAL)
-    return bar
-
-def createMask(canvas: Canvas, width:int = 100, height: int = 100):
-    rollFrame=createFrame(canvas)     # 在画布上创建frame
-    canvas.create_window((0,0),window=rollFrame,anchor='nw')
+def createViewRect(parent:BaseWidget | Tk, width:int, height:int):
+    # 少了这个就滚动不了
     def myfunction(event):
-        canvas.configure(scrollregion=canvas.bbox("all"))
+        canvas.configure(scrollregion=canvas.bbox("all"),width=width,height=height)
+
+    canvas = createCanvas(parent)     # 创建画布
+    canvas.pack(fill='both')
+    myscrollbar = createScrollBar(parent,False,command=canvas.yview)      #创建滚动条
+    myscrollbar.place(x=width, height=height)
+    canvas.configure(yscrollcommand=myscrollbar.set)
+    rollFrame = createFrame(canvas)     # 在画布上创建frame
+    canvas.create_window((0,0),window=rollFrame,anchor='nw')    # 要用create_window才能跟随画布滚动
     rollFrame.bind("<Configure>",myfunction)
+    rollFrame.config(width=width,height=height)
+    rollFrame.pack_propagate(False)
+
     return rollFrame
+
+def createScrollBar(parent:BaseWidget| Tk, bHor:bool, command:Callable | str = ''):
+    bar=Scrollbar(parent,orient=HORIZONTAL if bHor else VERTICAL, command=command)
+    return bar
 
 def createCanvas(parent:BaseWidget | Tk, width:int = 100, height: int = 100):
     canvas = Canvas(parent, width=width,height=height)

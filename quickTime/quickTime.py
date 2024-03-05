@@ -24,7 +24,7 @@ def onClose():
 
 quickTimeInit()
 
-window = tk.createWindow(name='quickTime',width=490,height=440)
+window = tk.createWindow(name='quickTime',width=490,height=410)
 window.protocol("WM_DELETE_WINDOW", lambda:onClose())
 window.resizable(False, False)
 
