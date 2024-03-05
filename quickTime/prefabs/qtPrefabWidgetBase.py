@@ -46,7 +46,7 @@ class QTPrefabWidgetBase:
                 index+=1
         else:
             self.delBtn.grid(row=0, column=0)
-            for btn in vbtnList:
+            for btn in vAllList:
                 btn.grid_forget()
             self.upBtn.grid(row=0, column=5)
 

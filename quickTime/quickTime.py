@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-from quickData import clearAll, createTimeJumpPfbData, getTimeJumpPfbData, quickTimeInit
+from quickData import clearAll, quickTimeInit
 from typeBtn.qtTypeBtnFact import createQTTypeBtnByType
 from tkGUI import tk
 import timeQuickJump
