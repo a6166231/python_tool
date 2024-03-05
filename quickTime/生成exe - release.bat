@@ -1,7 +1,7 @@
 @echo on
 set pname=quickTime
 
-pyinstaller --clean -F -p . %pname%.py --icon=.\icon\icon.ico -w
+pyinstaller --clean -F -p . %pname%.py --icon=.\icon\icon.ico -w --upx-dir F:\tool\upx-4.2.2-win32
 copy .\dist\%pname%.exe .\%pname%.exe
 
 del *.spec
