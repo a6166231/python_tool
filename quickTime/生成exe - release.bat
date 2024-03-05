@@ -1,6 +1,7 @@
 @echo on
 set pname=quickTime
-pyinstaller -F -p . %pname%.py --icon=.\icon\icon.ico -w
+
+pyinstaller --clean -F -p . %pname%.py --icon=.\icon\icon.ico -w
 copy .\dist\%pname%.exe .\%pname%.exe
 
 del *.spec
