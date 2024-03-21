@@ -4,10 +4,13 @@
     "note3":"out_path配置ts文件输出路径",
     "note4":"desc_line为描述的行号，type_line为字段类型的行号，param_line为字段名，data_line为数据行",
     "note5":"type_line如果没有数据的话，会根据data_line的数据尝试判断一次类型，失败后会默认any类型",
+    "note6":"suffix 导出的文件后缀",
 
 
     "excel_path": "E:/boxh5/H5Data/tables.xls",
     "out_path": "./out",
+
+    "suffix": ".d.ts",
 
     "desc_line": 0,
     "type_line": 2,
