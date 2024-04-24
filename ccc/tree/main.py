@@ -9,10 +9,7 @@ def createMainView():
     from tkGUI import tk
 
     def createViewRect(main:BaseWidget | Tk, width:int, height:int):
-        canvas = tk.createCanvas(main, width, height)
-        canvas.pack(anchor='nw', fill='both')
-        frame = tk.createMask(canvas, width,height)
-        frame.pack(fill='both')
+        frame = tk.createViewRect(main, width,height)
         return frame
 
     # 主窗口
