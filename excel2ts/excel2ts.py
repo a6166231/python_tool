@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import pandas as pd
 import os, json, sys
+import pandas as pd
 
 if getattr(sys, 'frozen', False):
     absPath = os.path.dirname(os.path.abspath(sys.executable))
@@ -32,6 +32,7 @@ PARAM_INDEX = cfgJson['param_line']
 DATA_INDEX = cfgJson['data_line']
 
 SUFFIX_NAME = cfgJson['suffix']
+MERGE_STATUS = cfgJson['merge']
 
 ANY = 'any'
 NUMBER = 'number'
@@ -39,7 +40,7 @@ ARRAY = 'Array<%>'
 STRNIG = 'string'
 LONG = 'Long'
 
-LONGPATH = 'import { Long } from "../net/Long";\n\n'
+LONGPATH = 'import { Long } from "core";\n\n'
 
 TYPE_DICT = {
     'int': NUMBER,
@@ -62,7 +63,7 @@ TYPE_PY = {
 }
 
 bAddLongImport = False
-
+bAddLongImported = False
 
 def getTypeByStr(s, p=[]):
     try:
@@ -111,7 +112,8 @@ def TryOpenExl(fp):
                 data = pd.read_csv(fp, header=None, encoding=code)
             result = 1
             break
-        except:
+        except Exception as e:
+            # print('error1 :', e)
             try:
                 if len(code) == 0:
                     data = pd.read_excel(fp, header=None)
@@ -119,12 +121,15 @@ def TryOpenExl(fp):
                     data = pd.read_excel(fp, header=None, encoding=code)
                 result = 2
                 break
-            except:
+            except Exception as e2:
+                # print('error2 :', e2)
                 pass
     if result < 0:
         print('cant open excel file!  ', FPATH)
     return result, data
 
+
+ts_text = ""
 
 def formatExcel(file_name: str):
     fp = os.path.join(FPATH, file_name)
@@ -136,8 +141,10 @@ def formatExcel(file_name: str):
 
     columns = data.columns.tolist()
     #头部注释
+    global ts_text
+
     #excel名
-    ts_text = "/**\n * \n * excel : %s\n" % (EXCEL_NAME)
+    ts_text += "/**\n * excel : %s\n" % (EXCEL_NAME)
     #excel导出对应的configmanager中的名字
     ts_text += " public %s: { [key: number]: %s } = {};\n" % (
         EXCEL_NAME.replace('cfg_', ''), CLS_NAME)
@@ -146,28 +153,41 @@ def formatExcel(file_name: str):
     #export interface部分
     ts_text += 'export interface %s {\n' % CLS_NAME
     for i in columns:
+        if pd.isna(data.at[PARAM_INDEX, i]):
+            continue
         ts_text += '\t/** %s */\n' % data.at[DESC_INDEX, i]
         ptype = getTypeByStr(data.at[TYPE_INDEX, i])
+        key = str(data.at[PARAM_INDEX, i]).strip().rstrip()
+
         if ptype == ANY:
             try:
                 ptype = getValueType(data.at[DATA_INDEX, i])
             except:
                 pass
-        ts_text += '\t%s: %s;\n' % (data.at[PARAM_INDEX, i], ptype)
+
+        ts_text += '\t%s: %s;\n' % (key, ptype)
     ts_text += '}\n'
 
     if not os.path.exists(OPATH):
         os.makedirs(OPATH)
 
     global bAddLongImport
+    global bAddLongImported
+
     if bAddLongImport:
-        ts_text = LONGPATH + ts_text
+        bAddLongImported = True
+        if not MERGE_STATUS:
+            ts_text = LONGPATH + ts_text
         bAddLongImport = False
 
-    with open("%s/%s%s" % (OPATH, CLS_NAME, SUFFIX_NAME),
-              "w",
-              encoding='utf-8') as f:
-        f.write(ts_text)
+    if not MERGE_STATUS:
+        with open("%s/%s%s" % (OPATH, CLS_NAME, SUFFIX_NAME),
+                  "w",
+                  encoding='utf-8') as f:
+            f.write(ts_text)
+        ts_text = ""
+    else:
+        ts_text += '\n'
     global tsCount
     tsCount += 1
     print('output %s%s ' % (CLS_NAME, SUFFIX_NAME))
@@ -208,44 +228,17 @@ if FPATH.find('tables.xls') > 0:
                 failList.append(fp)
 else:
     forEachPath()
-# import subprocess
 
-# INFO_PATH = '%s/_info.txt' % OPATH
-# ERROR_PATH = '%s/_error.txt' % OPATH
+if MERGE_STATUS:
 
-# def checkTsLint():
-#     print('- start ts check - ')
+    if bAddLongImported:
+        ts_text = LONGPATH + ts_text
 
-#     f = open(INFO_PATH,'w')
-#     f.write('')
-#     f.close()
-#     f = open(ERROR_PATH,'w')
-#     f.write('')
-#     f.close()
+    with open("%s/%s%s" % (OPATH, "ConfigType", SUFFIX_NAME),
+              "w",
+              encoding='utf-8') as f:
+        f.write(ts_text)
+    pass
 
-#     # try:
-#     if not os.path.exists('%s/tsconfig.json' % (OPATH)):
-#         os.chdir(OPATH)
-#         cmd = 'tsc --init'
-#         p = subprocess.Popen(cmd,shell=False,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-#         p.wait()
-#         p.kill()
-
-#         # os.system(cmd)
-#     cmd = 'tsc -p %s --outDir %s/tsc' % (OPATH,OPATH)
-#     f = open(INFO_PATH)
-#     p = subprocess.Popen(cmd,shell=False,stdout=f,stderr=subprocess.STDOUT)
-#     p.wait()
-#     p.kill()
-#     # except:
-#     #     print('hava no tsc, check fail! ')
-#     print('- check over - ')
-
-# try:
-#     if cfgJson["bCheckError"]:
-#         checkTsLint()
-# except:
-#     pass
-# print('\n - failList :  %s - ' % failList)
 print('\n - total out put ts:  %s - ' % tsCount)
 os.system('pause')

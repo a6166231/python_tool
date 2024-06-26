@@ -6,11 +6,11 @@
     "note5":"type_line如果没有数据的话，会根据data_line的数据尝试判断一次类型，失败后会默认any类型",
     "note6":"suffix 导出的文件后缀",
 
-
-    "excel_path": "E:/boxh5/H5Data/tables.xls",
+    "excel_path": "E:/YSH5/乌木剑/H5Data/tables.xls",
     "out_path": "./out",
 
     "suffix": ".d.ts",
+    "merge": false,
 
     "desc_line": 0,
     "type_line": 2,
