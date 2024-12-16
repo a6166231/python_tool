@@ -3,7 +3,7 @@ import json
 import os, sys
 from PIL import Image
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+# os.chdir(os.path.dirname(os.path.abspath(__file__)))
 V_SPF_KEYS = ['x', 'y', 'w', 'h', 'offX', 'offY', 'sourceW', 'sourceH']
 SPF_DICT_KEYS = {}
 
@@ -65,10 +65,13 @@ def gen_png_from_meta(meta_filename, png_filename):
         result_image.save(outfile)
     print(file_path + ' generated')
 
-
-dir = input('input files path:')
-if len(dir) == 0:
+try:
+    dir = sys.argv[1]
+except:
     dir = '.'
+    # input('input files path:')
+    # if len(dir) == 0:
+    #     dir = '.'
 
 bReplace_Png = input('hide extends suffix name [x_png.png -> x.png] ? (y/n)')
 
@@ -78,10 +81,15 @@ if len(bReplace_Png) == 0:
 hidePng = bReplace_Png == 'y'
 
 dest = []
+total = 0
+
 if os.path.isdir(dir):
     enumfiles('.', dest)
+elif os.path.isfile(dir):
+    fname = os.path.basename(dir)
+    dir = os.path.dirname(dir)
+    dest.append(fname.replace('.json', '').replace('.png', ''))
 
-total = 0
 for filename in dest:
     meta_filename = filename + '.json'
     png_filename = filename + '.png'
