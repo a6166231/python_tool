@@ -3,7 +3,6 @@ import json
 import os, sys
 from PIL import Image
 
-# os.chdir(os.path.dirname(os.path.abspath(__file__)))
 V_SPF_KEYS = ['x', 'y', 'w', 'h', 'offX', 'offY', 'sourceW', 'sourceH']
 SPF_DICT_KEYS = {}
 
@@ -46,15 +45,22 @@ def gen_png_from_meta(meta_filename, png_filename):
     for spf in spf_sheet_ary:
         width = int(spf['w'])
         height = int(spf['h'])
+
+        sourceWidth = int(spf['sourceW'])
+        sourceHeight = int(spf['sourceH'])
+
+        offx = int(spf['offX'])
+        offy = int(spf['offY'])
+
         x = int(spf['x'])
         y = big_image.height - int(spf['y']) - height
         y = int(spf['y'])
 
         box = (x, y, x + width, y + height)
         rect_on_big = big_image.crop(box)
-        sizelist = [width, height]
+        sizelist = [sourceWidth, sourceHeight]
         result_image = Image.new('RGBA', sizelist, (0, 0, 0, 0))
-        result_image.paste(rect_on_big, (0, 0))
+        result_image.paste(rect_on_big, (offx, offy))
 
         if not os.path.isdir(file_path):
             os.makedirs(file_path)
@@ -64,6 +70,7 @@ def gen_png_from_meta(meta_filename, png_filename):
         outfile = (file_path + '/' + fname + '.png')
         result_image.save(outfile)
     print(file_path + ' generated')
+
 
 try:
     dir = sys.argv[1]
