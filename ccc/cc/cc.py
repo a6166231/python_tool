@@ -125,9 +125,12 @@ class Sprite(Component):
         # 自动适配为精灵原图尺寸。
         RAW = 2,
 
+    spriteframe: str
+
     def __init__(self, spriteframe: str = ''):
         super().__init__()
         self.spriteframe = spriteframe
+    
 
 class Layout(Component):
     pass
