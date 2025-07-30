@@ -131,6 +131,12 @@ def TryOpenExl(fp):
 
 ts_text = ""
 
+def deepFormatKeysStr(keys: list, t: str):
+    if len(keys) == 0:
+        return t
+    ss = "{ [%s: number]: %s }" % (keys[0], deepFormatKeysStr(keys[1:], t))
+    return ss
+
 def formatExcel(file_name: str):
     fp = os.path.join(FPATH, file_name)
     EXCEL_NAME = os.path.basename(file_name.split(".")[0])
@@ -146,9 +152,15 @@ def formatExcel(file_name: str):
     #excel名
     ts_text += "/**\n * excel : %s\n" % (EXCEL_NAME)
     #excel导出对应的configmanager中的名字
-    ts_text += " public %s: { [key: number]: %s } = {};\n" % (
-        EXCEL_NAME.replace('cfg_', ''), CLS_NAME)
-    ts_text += " */\n"
+        
+    ts_text += " public %s: " % (EXCEL_NAME.replace('cfg_', ''))
+
+    if EXCEL_NAME in tableKeyMap:
+        ts_text += deepFormatKeysStr(tableKeyMap[EXCEL_NAME], CLS_NAME)
+    else:
+        ts_text += deepFormatKeysStr(['key'], CLS_NAME)
+    ts_text += " = {};"
+    ts_text += "\n */\n"
 
     #export interface部分
     ts_text += 'export interface %s {\n' % CLS_NAME
@@ -210,13 +222,39 @@ def forEachPath():
 excalEndName = ['.xls', '.csv']
 failList = []
 
+tableCfgData = {}
+tableKeyMap = {}
+
+TABLE_PATH = FPATH
+
 if FPATH.find('tables.xls') > 0:
-    dirName = os.path.dirname(FPATH)
-    result, data = TryOpenExl(FPATH)
+    pass
+else:
+    TABLE_PATH = os.path.join(os.path.dirname( FPATH), 'tables.csv')
+
+try:
+    result, data = TryOpenExl(TABLE_PATH)
     if result > 0:
+        tableCfgData = data
         count = data.describe()[0]['count']
         for i in range(1, count):
-            cfg = data.at[i, 0]
+            if pd.isna(data.at[i, 2]):
+                continue
+            lkey = str.split(data.at[i, 2], '#')
+            l = []
+            for item in lkey:
+                l.append(item)
+            tableKeyMap[data.at[i, 0]] = l
+except Exception as e:
+    print(e)
+    pass
+
+if FPATH.find('tables.xls') > 0:
+    if result > 0:
+        dirName = os.path.dirname(FPATH)
+        count = tableCfgData.describe()[0]['count']
+        for i in range(1, count):
+            cfg = tableCfgData.at[i, 0]
             fp = os.path.join(dirName, cfg)
             bExists = False
             for end in excalEndName:
